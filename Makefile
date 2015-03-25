@@ -21,6 +21,8 @@ endgame : endgame.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 endgame.cpp -lntl -lm -o endgame
 special : special.cpp RangeArray.h Primefns.h
 	g++ -I$(IDIR) -L$(LDIR) special.cpp -O3 -lntl -lm -o special
+ordinary : ordinary.cpp
+	g++ -I$(IDIR) -L$(LDIR) ordinary.cpp -O3 -lntl -lm -o ordinary
 opt : opt.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 opt.cpp -lntl -lm -o opt
 test : test.cpp

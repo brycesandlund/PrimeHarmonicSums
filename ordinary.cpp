@@ -18,13 +18,13 @@
 // Timings: 4.57 sec on jalapeno (Athlon XP1800+),
 //          6.08 sec on euler (Coppermine PIII)
 
-using namespace std;
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
 
 #include <NTL/quad_float.h>  // You need the NTL prefix
 
+using namespace std;
 using namespace NTL;
 
 #include "Primelist.h"
@@ -56,6 +56,8 @@ void muinit(int N)
 
 int main()
 {
+    cout << "bryce was here 2" << endl;
+
     quad_float gamma, log2;
     gamma = to_quad_float("0.57721566490153286060651209008240243");
     log2 =  to_quad_float("0.69314718055994530941723212145817657");
