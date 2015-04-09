@@ -127,8 +127,10 @@ using namespace NTL;
 
 #include "RangeArray.h"  // includes defn of ftype 
 
-#define xSTART 1801241484456448000LL
-double mhat = 1105.0;
+//#define xSTART 1801241484456448000LL
+#define xSTART 8
+//double mhat = 1105.0;
+double mhat = 5;
 
 // table of mhat values for the x we are testing
 // these seem to be very close to x^(1/6)

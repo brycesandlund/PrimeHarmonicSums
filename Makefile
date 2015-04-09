@@ -23,9 +23,14 @@ special : special.cpp RangeArray.h Primefns.h
 	g++ -I$(IDIR) -L$(LDIR) special.cpp -O3 -lntl -lm -o special
 ordinary : ordinary.cpp
 	g++ -I$(IDIR) -L$(LDIR) ordinary.cpp -O3 -lntl -lm -o ordinary
+checker : checker.cc
+	g++ -I$(IDIR) -L$(LDIR) checker.cc -O3 -lntl -lm -o checker
+s2 : s2.cc
+	g++ -I$(IDIR) -L$(LDIR) s2.cc -O3 -lntl -lm -o s2
 opt : opt.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 opt.cpp -lntl -lm -o opt
 test : test.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 test.cpp -lntl -lm -o test
 shn : shn.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 shn.cpp -lntl -lm -o shn
+

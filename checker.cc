@@ -16,9 +16,9 @@ int main()
   quad_float::SetOutputPrecision(30);
 
   double goal;
-  //cout << "Enter goal: ";
-  //cin >> goal;
-  goal=3.25;
+  cout << "Enter goal: ";
+  cin >> goal;
+  //goal=3.25;
   x = exp(exp(goal-0.26149));
   //x = 173.0*173.0*173.0;
   x = x*1.1;

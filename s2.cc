@@ -2,10 +2,10 @@
 //
 // The user inputs x, and this program computes S2.
 
-using namespace std;
 #include <NTL/quad_float.h>
-using namespace NTL;
 #include "Primelist.h"
+using namespace std;
+using namespace NTL;
 
 quad_float to_quad_float(long long n)
 {
