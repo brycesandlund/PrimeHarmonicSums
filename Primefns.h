@@ -21,12 +21,12 @@ public:
   Primelist P(size);
   for (i=1;i<=size;i++) M[i] = 1;
   S = (int) sqrt((double)size);
-  cout << "Mulist: size = " << size << " S = " << S << endl;
+  cerr << "Mulist: size = " << size << " S = " << S << endl;
 
   P.reset();
   for (;;) {
         p = P.next();
-	// Debug cout << "p = " << p << endl;
+	// Debug cerr << "p = " << p << endl;
         for(i = p;i<=size;i+=p) M[i] = -M[i];
 	if (p <= S) for(i = p*p;i<=size;i+= p*p) M[i] = 0; 
         if (p == P.max()) break;
@@ -41,7 +41,7 @@ public:
   void print() {
   long i;
   for (i=1;i<=Msize;i++) {
-      printf("%d %d\n",i,M[i]);
+      printf("%ld %d\n",i,M[i]);
       }
   }
 
@@ -63,7 +63,7 @@ public:
   P.reset();
   for (;;) {
         p = P.next();
-        // Debug cout << "p = " << p << endl;
+        // Debug cerr << "p = " << p << endl;
         for(i = p;i<=size;i+=p) L[i] = p;
         if (p == P.max()) break;
         }
@@ -75,7 +75,7 @@ public:
   void print() {
   long i;
   for (i=1;i<=Lsize;i++) {
-      printf("%d %d\n",i,L[i]);
+      printf("%ld %ld\n",i,L[i]);
       }
   }
 
@@ -97,7 +97,7 @@ public:
   P.reset();
   for (;;) {
         p = P.next();
-        // Debug cout << "p = " << p << endl;
+        // Debug cerr << "p = " << p << endl;
         for(i = p;i<=size;i+=p) if (!S[i]) S[i] = p;
         if (p == P.max()) break;
         }
@@ -111,7 +111,7 @@ public:
   void print() {
   long i;
   for (i=1;i<=Ssize;i++) {
-      printf("%d %d\n",i,S[i]);
+      printf("%ld %ld\n",i,S[i]);
       }
   }
 

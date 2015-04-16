@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
 
@@ -16,9 +17,10 @@ bool isPrime(ll n) {
     return true;
 }
 
-int main() {
-    ll x;
-    cin >> x;
+int main(int argc, char *argv[]) {
+    cout << setprecision(20);
+    cout << fixed;
+    ll x = atoll(argv[1]);
 
     double sum = 0;
     for (ll i = x; i >= 2; --i) {
@@ -28,4 +30,5 @@ int main() {
     }
 
     cout << sum << endl;
+    return 0;
 }

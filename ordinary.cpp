@@ -31,6 +31,8 @@ using namespace NTL;
 
 #define SIZE 2000000
 
+typedef quad_float ftype;
+
 int mu[SIZE];  // I know, this should use a class ...
 
 void muinit(int N)
@@ -47,71 +49,65 @@ void muinit(int N)
     P.reset();
     for (;;) {
         p = P.next();
-        //  -- DEBUG -- cout << "p = " << p << endl;
+        //  -- DEBUG -- cerr << "p = " << p << endl;
         for(i = p;i<N;i+=p) mu[i] = -mu[i];
         if (p <= S) for(i = p*p;i<N;i+= p*p) mu[i] = 0;
         if (p == P.max()) break;
     }
 }
 
-int main()
-{
-    cout << "bryce was here 2" << endl;
-
-    quad_float gamma, log2;
+ftype phi_o(long long x) {
+    ftype gamma, log2;
     gamma = to_quad_float("0.57721566490153286060651209008240243");
     log2 =  to_quad_float("0.69314718055994530941723212145817657");
-    quad_float::SetOutputPrecision(30);
+    ftype::SetOutputPrecision(30);
     
     Primelist P(SIZE);
     muinit(SIZE);
     
-    for (;;) {
         
-        quad_float x,y,y2,y4,y6,
-        phi,t,
-        sum,sumpos,sumneg,sumomit,sumomit2;
-        
-        long int N,m,count;
-        
-        printf("x: ");
-        cin >> x;
-        
-        // x = 1e18;
-        
-        N = to_long( floor(exp(log(x)/3)) );   // [ cube root of x ]
-        
-        cout << x << endl;
-        cout << N << endl;
-        
-        sum = 0;
-        sumpos = 0;
-        sumneg = 0;
-        sumomit = 0;
-        sumomit2 = 0;
-        count = 0;
-        for (m=N;m>=1;m--) if (m&01 && mu[m]) {
-            y = 2*floor((x/m-1)/2) + 1; /* largest odd <= x/m */
-            y2 = y*y;
-            y4 = y2*y2;
-            y6 = y2*y4;
-            phi = log(y)/2  + (gamma + log2)/2 + 1/(2*y) - 1/(6*y2);
-            t = mu[m]*phi/m;
-            sum += t;
-            if (mu[m] > 0) sumpos += phi/m;
-            else sumneg += phi/m;
-            sumomit += mu[m]/(15*m*y4);
-            sumomit2 += 8*mu[m]/(63*m*y6);
-            count++;
-        }
-        
-        cout << count << " ordinary nodes." << endl;
-        cout << " sum of positive terms = " << sumpos << endl;
-        cout << " sum of negative terms = " << sumneg << endl;
-        cout << " sum = " << sum << endl;
-        cout << " inconsistency : " << sum - (sumpos - sumneg) << endl;
-        cout << " sum of first term omitted = " << sumomit << endl;
-        cout << " sum of next after that= " << sumomit2 << endl;
-        
+    ftype y,y2,y4,y6,
+    phi,t,
+    sum,sumpos,sumneg,sumomit,sumomit2;
+    
+    long int N,m,count;
+    
+    // x = to_ftype(argv[1]);
+    // x = 1e18;
+    
+    N = to_long( floor(exp(log(x)/3)) );   // [ cube root of x ]
+    
+    cerr << x << endl;
+    cerr << N << endl;
+    
+    sum = 0;
+    sumpos = 0;
+    sumneg = 0;
+    sumomit = 0;
+    sumomit2 = 0;
+    count = 0;
+    for (m=N;m>=1;m--) if (m&01 && mu[m]) {
+        y = 2*floor((x/m-1)/2) + 1; /* largest odd <= x/m */
+        y2 = y*y;
+        y4 = y2*y2;
+        y6 = y2*y4;
+        phi = log(y)/2  + (gamma + log2)/2 + 1/(2*y) - 1/(6*y2);
+        t = mu[m]*phi/m;
+        sum += t;
+        if (mu[m] > 0) sumpos += phi/m;
+        else sumneg += phi/m;
+        sumomit += mu[m]/(15*m*y4);
+        sumomit2 += 8*mu[m]/(63*m*y6);
+        count++;
     }
+    
+    cerr << count << " ordinary nodes." << endl;
+    cerr << " sum of positive terms = " << sumpos << endl;
+    cerr << " sum of negative terms = " << sumneg << endl;
+    cerr << " sum = " << sum << endl;
+    cerr << " inconsistency : " << sum - (sumpos - sumneg) << endl;
+    cerr << " sum of first term omitted = " << sumomit << endl;
+    cerr << " sum of next after that= " << sumomit2 << endl;
+
+    return sum;
 }

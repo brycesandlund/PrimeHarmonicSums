@@ -111,15 +111,12 @@
 // 7/30 developed some "theory" for how to set tree degrees.
 // For details see opt.cpp in this directory
 
-using namespace std;
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
 
 #include <NTL/quad_float.h>  // You need the NTL prefix
 //  #include <NTL/RR.h>  // If using RR -- remember to fix RangeArray.h too
-
-using namespace NTL;
 
 #include "Primelist.h"
 
@@ -130,7 +127,11 @@ using namespace NTL;
 //#define xSTART 1801241484456448000LL
 #define xSTART 8
 //double mhat = 1105.0;
-double mhat = 5;
+
+using namespace std;
+using namespace NTL;
+
+double mhat = 319;
 
 // table of mhat values for the x we are testing
 // these seem to be very close to x^(1/6)
@@ -150,14 +151,14 @@ double mhat = 5;
 //         "   10^16 is  9999934692543307
 //         "   1.5e15 is 1499983322109111
 
-void phi_s(long long x)  // transliteration of maple code in psum.m
+ftype phi_s(long long x)  // transliteration of maple code in psum.m
 {                        // however we will compute a rather than bring it in
     long a; 
     long i;
 
     long x13; // exact cube root of x -- abort if not integral
     x13 = round(pow((double)x, 1.0/3));
-    if ((long long)x13*x13*x13 != x) { cout << "Bad x = " << x << endl; exit(1); }
+    if ((long long)x13*x13*x13 != x) { cerr << "Bad x = " << x << endl; exit(1); }
 
     double x23; // used for some bounds so we may as well compute it now
     x23 = (double)x13*x13;
@@ -168,25 +169,25 @@ void phi_s(long long x)  // transliteration of maple code in psum.m
     long pa;   // a-th prime
     pa = nthprime(a);
 
-    cout << setprecision(18);
+    cerr << setprecision(18);
     quad_float::SetOutputPrecision(30);
 
-    cout << "x = " << x << endl;
-    cout << "x13 = " << x13 << endl;
-    cout << "x23 = " << x23 << endl;
-    cout << "a = " << a << endl;
-    cout << "pa = " << pa << endl;
+    cerr << "x = " << x << endl;
+    cerr << "x13 = " << x13 << endl;
+    cerr << "x23 = " << x23 << endl;
+    cerr << "a = " << a << endl;
+    cerr << "pa = " << pa << endl;
 
     ftype *C;  // cumulative sum array
     long b;    // index for primes
     C = new ftype[a-1];
     for (b=1;b<=a-2;b++) C[b] = 0;
-    cout << "C done." << endl; 
+    cerr << "C done." << endl; 
 
     Mulist M(x13); // table of Mobius function (computed correctly)
-    cout << "M done." << endl; 
+    cerr << "M done." << endl; 
     Spflist S(x13); // table of smallest prime factor
-    cout << "S done." << endl; 
+    cerr << "S done." << endl; 
 
     long *Mprimetable; // lists smallest prime factor for odd squarefree numbers
     Mprimetable = new long[x13+1];
@@ -198,17 +199,17 @@ void phi_s(long long x)  // transliteration of maple code in psum.m
         else Mprimetable[i] = 0;
     }
 
-    cout << "Mprimetable done." << endl; 
+    cerr << "Mprimetable done." << endl; 
 
     long long Mchek;
     Mchek = 0;
     for (i=1;i<=x13;i++) Mchek += Mprimetable[i];
-    cout << "Mprimetable check sum = " << Mchek << endl; 
+    cerr << "Mprimetable check sum = " << Mchek << endl; 
 
     long *Nextmprime;
     Nextmprime = new long[a-1];
     for (b=1;b<=a-2;b++) Nextmprime[b] = x13;
-    cout << "Nextmprime done." << endl; 
+    cerr << "Nextmprime done." << endl; 
 
     // include if you want the node count map
     // long *Nodecount; Nodecount = new long[a-1];
@@ -231,117 +232,111 @@ void phi_s(long long x)  // transliteration of maple code in psum.m
     lo = 0;
     deg = 2097152; // segment 0 has no special nodes so we just sieve
 
-    for (k=0; k<=x13;k++)  {
+    for (k=0; k<=x13;k++) {
 
         lo = (long long)k*x13;
 
         // Efficiency not worth it here since we are in the outer loop
         if (k==1) {
-            cout << "Initial sift done." << endl;
-            deg = 4; }
-            if (k>1 && deg == 4 && countthisk < 2000000) deg = 8;
-            if (k>1 && deg == 8 && countthisk < 100000) deg = 16;
-            if (k>1 && deg == 16 && countthisk < 50000) deg =  64;
-            if (k>1 && deg == 64 && countthisk < 10000) deg = 128;
-            if (k>1 && deg == 128 && countthisk < 1000) deg = 2048;
-            if (k>1 && deg == 2048 && countthisk <= 2) deg = 2097152;
+            cerr << "Initial sift done." << endl;
+            deg = 4;
+        }
 
-            RangeArray R(lo,x13,deg);
+        if (k>1 && deg == 4 && countthisk < 2000000) deg = 8;
+        if (k>1 && deg == 8 && countthisk < 100000) deg = 16;
+        if (k>1 && deg == 16 && countthisk < 50000) deg =  64;
+        if (k>1 && deg == 64 && countthisk < 10000) deg = 128;
+        if (k>1 && deg == 128 && countthisk < 1000) deg = 2048;
+        if (k>1 && deg == 2048 && countthisk <= 2) deg = 2097152;
 
-            countthisk = 0;
+        RangeArray R(lo,x13,deg);
 
-            // clear node count map
-            // for (b=1;b<=a-2;b++) Nodecount[b] = 0;
+        countthisk = 0;
 
-            for (b=1;b<=a-2;b++) {
+        // clear node count map
+        // for (b=1;b<=a-2;b++) Nodecount[b] = 0;
 
-                countthisb = 0;
+        for (b=1;b<=a-2;b++) {
 
-                q = nthprime(b+1);
-                if (q > x23/(mhat*k)) break; // all done with this k
+            countthisb = 0;
+
+            q = nthprime(b+1);
+            if (q > x23/(mhat*k)) break; // all done with this k
 
 
-                bound = x23/((k+1.0)*q);  // check that this is OK!
+            bound = x23/((k+1.0)*q);  // check that this is OK!
 
-                mprime = Nextmprime[b];
-                while (mprime > bound) {  
+            mprime = Nextmprime[b];
+            while (mprime > bound) {  
 
-                    if (Mprimetable[mprime] > q) {
+                if (Mprimetable[mprime] > q) {
 
-                        m = (long long) mprime*q;
+                    m = (long long) mprime*q;
 
-                        // include if you want a list of special nodes
-                        // cout << "special node " ;
-                        // cout << x << "/" << m << ", " << b << endl;
+                    // include if you want a list of special nodes
+                    cerr << "special node " ;
+                    cerr << x << "/" << m << ", " << b << endl;
 
-                        countthisk++;
-                        countthisb++;
+                    countthisk++;
+                    countthisb++;
 
-                        // bump node count map
-                        // Nodecount[b]++ ;
+                    // bump node count map
+                    // Nodecount[b]++ ;
 
-                        thisnode = C[b] + R.prefix(x/m-lo);
-                        term = thisnode/m;
+                    thisnode = C[b] + R.prefix(x/m-lo);
+                    term = thisnode/m;
 
-                        if (M.mu(mprime)>0) {
-                            totalneg += term;
-                            total -= term;
-                        }
-                        else {
-                            totalpos += term;
-                            total += term;
-                        }
-
+                    if (M.mu(mprime) > 0) {
+                        totalneg += term;
+                        total -= term;
                     }
-
-                    mprime--;  // iterating thru odds makes very little difference
+                    else {
+                        totalpos += term;
+                        total += term;
+                    }
 
                 }
 
-                Nextmprime[b] = mprime;
+                mprime--;  // iterating thru odds makes very little difference
 
-                C[b] += R.total();
-                R.sift(q);
             }
 
-            // include if you want a count of special nodes per segment
-            if (countthisk) { 
-                cout << "sgmt " << k << ": " << countthisk << " nodes." << endl;
-                // cout << "total = " << total << endl;
-            }
+            Nextmprime[b] = mprime;
 
-            // include if you want the node count map
-            // if (countthisk) {
-            // cout << "node count map: " ;
-            // for (b=1;b<=a-2;b++) cout << Nodecount[b] << " " ;
-            // cout << "   " << k << endl;
-            // }
+            C[b] += R.total();
+            R.sift(q);
+        }
 
-            specialcount += countthisk;
+        // include if you want a count of special nodes per segment
+        if (countthisk) { 
+            cerr << "sgmt " << k << ": " << countthisk << " nodes." << endl;
+            // cerr << "total = " << total << endl;
+        }
+
+        // include if you want the node count map
+        // if (countthisk) {
+        // cerr << "node count map: " ;
+        // for (b=1;b<=a-2;b++) cerr << Nodecount[b] << " " ;
+        // cerr << "   " << k << endl;
+        // }
+
+        specialcount += countthisk;
 
     }
 
-    cout << "x = " << x << endl;
+    cerr << "x = " << x << endl;
 
-    cout << specialcount << " special nodes." << endl;
+    cerr << specialcount << " special nodes." << endl;
 
-    cout << "LMO estimate = " << (double)a*a/2 << endl;
+    cerr << "LMO estimate = " << (double)a*a/2 << endl;
     // Note: this estimate is basically pairs p>q with p*q > x^(1/3)
 
-    cout << "actual/estimate = " << specialcount/ ( (double)a*a/2 ) << endl;
+    cerr << "actual/estimate = " << specialcount/ ( (double)a*a/2 ) << endl;
 
-    cout << "total positive terms = " << totalpos << endl;
-    cout << "total negative terms = " << totalneg << endl;
-    cout << "               total = " << total << endl;
-    cout << "         discrepancy = " << total - (totalpos - totalneg) << endl;
+    cerr << "total positive terms = " << totalpos << endl;
+    cerr << "total negative terms = " << totalneg << endl;
+    cerr << "               total = " << total << endl;
+    cerr << "         discrepancy = " << total - (totalpos - totalneg) << endl;
 
+    return total;
 }
-
-int main()
-{
-    cout << "bryce here again" << endl;
-
-    quad_float::SetOutputPrecision(32);
-    phi_s(xSTART);
-}
-

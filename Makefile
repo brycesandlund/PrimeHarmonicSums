@@ -19,18 +19,19 @@ endgamehi : endgamehi.cpp
 	g++ -I$(IDIR) -L$(LDIR) endgamehi.cpp -lntl -lm -o endgamehi
 endgame : endgame.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 endgame.cpp -lntl -lm -o endgame
-special : special.cpp RangeArray.h Primefns.h
-	g++ -I$(IDIR) -L$(LDIR) special.cpp -O3 -lntl -lm -o special
-ordinary : ordinary.cpp
-	g++ -I$(IDIR) -L$(LDIR) ordinary.cpp -O3 -lntl -lm -o ordinary
-checker : checker.cc
-	g++ -I$(IDIR) -L$(LDIR) checker.cc -O3 -lntl -lm -o checker
-s2 : s2.cc
-	g++ -I$(IDIR) -L$(LDIR) s2.cc -O3 -lntl -lm -o s2
+special_main : special_main.cpp RangeArray.h Primefns.h
+	g++ -I$(IDIR) -L$(LDIR) special_main.cpp -O3 -lntl -lm -o special_main
+ordinary_main : ordinary_main.cpp ordinary.cpp
+	g++ -I$(IDIR) -L$(LDIR) ordinary_main.cpp -O3 -lntl -lm -o ordinary_main
+checker : checker.cpp
+	g++ -I$(IDIR) -L$(LDIR) checker.cpp -O3 -lntl -lm -o checker
+S2_main : S2_main.cpp S2.cpp 
+	g++ -I$(IDIR) -L$(LDIR) -O3 S2_main.cpp -lntl -lm -o S2_main
 opt : opt.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 opt.cpp -lntl -lm -o opt
 test : test.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 test.cpp -lntl -lm -o test
 shn : shn.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 shn.cpp -lntl -lm -o shn
-
+fullsum : fullsum.cpp RangeArray.h special.cpp ordinary.cpp S2.cpp Primefns.h
+	g++ -I$(IDIR) -L$(LDIR) -O3 fullsum.cpp -lntl -lm -o fullsum

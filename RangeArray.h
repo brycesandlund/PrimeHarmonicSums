@@ -35,138 +35,138 @@ using namespace std;
 #include <cmath>
 
 // #include <NTL/quad_float.h>  // You need the NTL prefix
-                     #include <NTL/RR.h>  // You need the NTL prefix
+#include <NTL/RR.h>  // You need the NTL prefix
 using namespace NTL;
 
 #include "Primelist.h"
 
-#define ftype quad_float // use a template here ?
+typedef quad_float ftype;
 
 #define recip(x) 1.0/(x)
 
 class RangeArray  // sieveable array w/ fast prefix sum capability
 {                 // the leaf for t = offset+i has the value 1/t
-                  // if you want to change this look for places 
-                  // marked with ###
+    // if you want to change this look for places 
+    // marked with ###
 
-private:
-   char *B; // bit array; 1 for in, 0 for out;
-   long long offset; // can't be 0 unless we pre-sieve by 2
-   unsigned long size; // we assume size > 1
-   ftype *T; // tree of sums
-   long b; // branching factor
-   long tsize; // number of nodes
-   long lc;   // left corner == B0's parent
+    private:
+        char *B; // bit array; 1 for in, 0 for out;
+        long long offset; // can't be 0 unless we pre-sieve by 2
+        unsigned long size; // we assume size > 1
+        ftype *T; // tree of sums
+        long b; // branching factor
+        long tsize; // number of nodes
+        long lc;   // left corner == B0's parent
 
-public:
-   // constructor
-   inline RangeArray(const long long o, const long s, const long d) {
-   unsigned long long pow;
+    public:
+        // constructor
+        inline RangeArray(const long long o, const long s, const long d) {
+            unsigned long long pow;
 
-   offset = o;
-   size = s;
-   B = new char[size];
+            offset = o;
+            size = s;
+            B = new char[size];
 
-   b = d;
-   lc = 0; pow = 1;    // find left corner (can screw up if b is large)
-   while (pow < s) {   // and compute # of actual tree nodes
-         lc += pow;
-         pow *= b;
-         }
+            b = d;
+            lc = 0; pow = 1;    // find left corner (can screw up if b is large)
+            while (pow < s) {   // and compute # of actual tree nodes
+                lc += pow;
+                pow *= b;
+            }
 
-   tsize = (lc+s-2)/b + 1;
-   T = new ftype[tsize];
+            tsize = (lc+s-2)/b + 1;
+            T = new ftype[tsize];
 
-   reset(offset);
-   }
-
-   void reset(long long o) { // we assume size doesn't change
-   ftype t;
-   unsigned long i, p;
-
-   for (i=0;i<tsize;i++)  T[i] = 0;
-
-   offset = o;
-
-   // pre-sieve by 2
-   long even, odd;
-   even = offset%2; odd = 1-even;
-   for (i=even;i<size;i+=2) B[i] = 0;
-   // if you don't want to do this replace the next line by
-   // for (i=0;i<size;i++)  
-
-   for (i=odd;i<size;i+=2)  { // turn odd bits on and compute subtree totals
-       t = offset+i; t = recip(t); // ###
-       B[i] = 1;
-       p = (lc+i-1)/b;
-       for (;;) {
-           T[p] += t;
-           if (!p) break;
-           p = (p-1)/b;
-           }
-       }
-   }
-
-   ~RangeArray() { // destructor, called at block/proc exit
-   if (B!=NULL) delete[]B; 
-   if (T!=NULL) delete[]T; 
-   }
-
-   void print() {                 // prints bit array and sum tree
-   long i, rc, pow;
-   printf("offset = %lld  size = %d.\n",offset,size);
-   printf("b = %d  tsize = %d  lc = %d\n",b,tsize,lc);
-   return; // delete to get more info
-   for (i=0;i<size;i++) {
-       printf("%d",B[i]);
-       }
-   printf("\n");
-   return; // ditto
-   rc = 0; pow = b;
-   for (i=0;i<tsize;i++) {
-        cout << T[i] << " " ;
-        if (i==rc) { cout << endl;
-                     rc = rc+pow;
-                     pow *= b;
-                     }
+            reset(offset);
         }
-   printf("\n\n");
-   }
 
-   void sift(const long d) { // clears every d-th Bi
-   ftype t;
-   unsigned long i, p;
-   i = d - (offset%d); if (i==d) i=0; // min i s.t. offset+i == 0 mod d
-   for (;i<size;i+=d) if (B[i]) {
-           t = offset+i; t = recip(t); // ###
-           B[i] = 0;
-           p = (lc+i-1)/b;
-           for (;;) {
-               T[p] -= t;
-               if (!p) break;
-               p = (p-1)/b;
-               }
-           }
-   }
+        void reset(long long o) { // we assume size doesn't change
+            ftype t;
+            unsigned long i, p;
 
-   ftype prefix(const long i) {  // sum values @ offset+0..i; need 0 <= i < s.
-   unsigned long r, p, j;
-   ftype t, s;
-   r = i%b; // rank of i compared to its siblings, counted from 0
-   s = 0;
-   for (j=i-r;j<=i;j++) if (B[j]) {t = offset+j; s += recip(t);}
-   p = (lc+i-1)/b;
-   while (p) {
-          r = (p-1)%b;
-          for (j=p-r;j<p;j++) s += T[j]; // ###
-          p = (p-1)/b;
-          }
-   return(s);
-   }
+            for (i=0;i<tsize;i++)  T[i] = 0;
 
-   ftype total() { // fast way to get to prefix(s-1)
-   return(T[0]);
-   }
+            offset = o;
+
+            // pre-sieve by 2
+            long even, odd;
+            even = offset%2; odd = 1-even;
+            for (i=even;i<size;i+=2) B[i] = 0;
+            // if you don't want to do this replace the next line by
+            // for (i=0;i<size;i++)  
+
+            for (i=odd;i<size;i+=2)  { // turn odd bits on and compute subtree totals
+                t = offset+i; t = recip(t); // ###
+                B[i] = 1;
+                p = (lc+i-1)/b;
+                for (;;) {
+                    T[p] += t;
+                    if (!p) break;
+                    p = (p-1)/b;
+                }
+            }
+        }
+
+        ~RangeArray() { // destructor, called at block/proc exit
+            if (B!=NULL) delete[]B; 
+            if (T!=NULL) delete[]T; 
+        }
+
+        void print() {                 // prints bit array and sum tree
+            long i, rc, pow;
+            printf("offset = %lld  size = %lu.\n",offset,size);
+            printf("b = %ld  tsize = %ld  lc = %ld\n",b,tsize,lc);
+            return; // delete to get more info
+            for (i=0;i<size;i++) {
+                printf("%d",B[i]);
+            }
+            printf("\n");
+            return; // ditto
+            rc = 0; pow = b;
+            for (i=0;i<tsize;i++) {
+                cout << T[i] << " " ;
+                if (i==rc) { cout << endl;
+                    rc = rc+pow;
+                    pow *= b;
+                }
+            }
+            printf("\n\n");
+        }
+
+        void sift(const long d) { // clears every d-th Bi
+            ftype t;
+            unsigned long i, p;
+            i = d - (offset%d); if (i==d) i=0; // min i s.t. offset+i == 0 mod d
+            for (;i<size;i+=d) if (B[i]) {
+                t = offset+i; t = recip(t); // ###
+                B[i] = 0;
+                p = (lc+i-1)/b;
+                for (;;) {
+                    T[p] -= t;
+                    if (!p) break;
+                    p = (p-1)/b;
+                }
+            }
+        }
+
+        ftype prefix(const long i) {  // sum values @ offset+0..i; need 0 <= i < s.
+            unsigned long r, p, j;
+            ftype t, s;
+            r = i%b; // rank of i compared to its siblings, counted from 0
+            s = 0;
+            for (j=i-r;j<=i;j++) if (B[j]) {t = offset+j; s += recip(t);}
+            p = (lc+i-1)/b;
+            while (p) {
+                r = (p-1)%b;
+                for (j=p-r;j<p;j++) s += T[j]; // ###
+                p = (p-1)/b;
+            }
+            return(s);
+        }
+
+        ftype total() { // fast way to get to prefix(s-1)
+            return(T[0]);
+        }
 
 };
 
@@ -174,12 +174,12 @@ public:
 
 
 void Htest(long n) { // computes and prints first n odd-harmonic numbers
-RangeArray R(1,n,2); // (sum of 1/n for odd n)
-long i;
-ftype sum;
-sum = 0;
-for (i=0;i<n;i++) {
-    cout << i+1 << " " << R.prefix(i) << endl; 
+    RangeArray R(1,n,2); // (sum of 1/n for odd n)
+    long i;
+    ftype sum;
+    sum = 0;
+    for (i=0;i<n;i++) {
+        cout << i+1 << " " << R.prefix(i) << endl; 
     }
 };
 // Reference output:
@@ -196,27 +196,27 @@ for (i=0;i<n;i++) {
 // 19,20 2.13325553015955492735678494192
 
 void Stest(long n) { // computes and prints sum of 1/p for p <= n
-long s, p;
-ftype t, total;
-s = (int) sqrt(n)+1;
-                        cout << n << endl;
-                        cout << s << endl;
-RangeArray R(1,n,2097152);
-                        cout << "RangeArray done." << endl;
-Primelist P(s);      // was P(s); changed to n to get a realistic test
-                        cout << "Primelist done." << endl;
-P.reset();
-total = 0;
-for (;;) {
+    long s, p;
+    ftype t, total;
+    s = (int) sqrt(n)+1;
+    cout << n << endl;
+    cout << s << endl;
+    RangeArray R(1,n,2097152);
+    cout << "RangeArray done." << endl;
+    Primelist P(s);      // was P(s); changed to n to get a realistic test
+    cout << "Primelist done." << endl;
+    P.reset();
+    total = 0;
+    for (;;) {
         p = P.next();
         t = p; total += recip(t); // ###
         R.sift(p);
         if (p == P.max()) break;
-        }
+    }
 
-total += R.total();
-total -= 1;
-cout << n << " " << total << endl;
+    total += R.total();
+    total -= 1;
+    cout << n << " " << total << endl;
 };
 // Reference value: for n = 10^6 Maple gets
 // 2.887328099567672712348011299009470085543
