@@ -3,6 +3,6 @@
 using namespace std;
 
 int main() {
-    quad_float result = phi_s(1000000);
+    quad_float result = phi_s(1000);
     cout << result << endl;
 }
