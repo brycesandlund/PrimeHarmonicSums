@@ -124,6 +124,8 @@
 
 #include "RangeArray.h"  // includes defn of ftype 
 
+#define EP 1e-10
+
 //#define xSTART 1801241484456448000LL
 //#define xSTART 8
 //double mhat = 1105.0;
@@ -156,14 +158,14 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
     long a; 
     long i;
 
-    long x13; // exact cube root of x -- abort if not integral
-    x13 = round(pow((double)x, 1.0/3));
-    if ((long long)x13*x13*x13 != x) { cerr << "Bad x = " << x << endl; exit(1); }
+    double x13; // exact cube root of x -- abort if not integral <- no longer do this!
+    x13 = pow((double)x, 1.0/3);
+//    if ((long long)x13*x13*x13 != x) { cerr << "Bad x = " << x << endl; exit(1); }
 
     double x23; // used for some bounds so we may as well compute it now
     x23 = (double)x13*x13;
 
-    Primelist P(x13);
+    Primelist P((long long)(x13+EP));
     a = P.length();
 #define nthprime(x) P[(x)-1]  // since P[0] = 2, P[1] = 3, etc.
     long pa;   // a-th prime
@@ -184,15 +186,15 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
     for (b=1;b<=a-2;b++) C[b] = 0;
     cerr << "C done." << endl; 
 
-    Mulist M(x13); // table of Mobius function (computed correctly)
+    Mulist M((int)(x13+1-EP)); // table of Mobius function (computed correctly)
     cerr << "M done." << endl; 
-    Spflist S(x13); // table of smallest prime factor
+    Spflist S((int)(x13+1-EP)); // table of smallest prime factor
     cerr << "S done." << endl; 
 
     long *Mprimetable; // lists smallest prime factor for odd squarefree numbers
-    Mprimetable = new long[x13+1];
+    Mprimetable = new long[(int)(x13+1+EP)];
     Mprimetable[1] = 1;
-    for (i=2;i<=x13;i++) {
+    for (i=2;i<=x13+EP;i++) {
         if (M.mu(i) && (i%2)) {
             Mprimetable[i] = S.spf(i);
         }
@@ -203,7 +205,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
     long long Mchek;
     Mchek = 0;
-    for (i=1;i<=x13;i++) Mchek += Mprimetable[i];
+    for (i=1;i<=x13+EP;i++) Mchek += Mprimetable[i];
     cerr << "Mprimetable check sum = " << Mchek << endl; 
 
     long *Nextmprime;
@@ -232,9 +234,9 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
     lo = 0;
     deg = 2097152; // segment 0 has no special nodes so we just sieve
 
-    for (k=0; k<=x13;k++) {
+    for (k=0; k<=x13+EP;k++) {
 
-        lo = (long long)k*x13;
+        lo = (long long)(k*x13+EP);
 
         // Efficiency not worth it here since we are in the outer loop
         if (k==1) {
@@ -249,7 +251,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
         if (k>1 && deg == 128 && countthisk < 1000) deg = 2048;
         if (k>1 && deg == 2048 && countthisk <= 2) deg = 2097152;
 
-        RangeArray R(lo,x13,deg);
+        RangeArray R(lo,(int)(x13+1-EP),deg);
 
         countthisk = 0;
 
@@ -273,10 +275,6 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
                     m = (long long) mprime*q;
 
-                    // include if you want a list of special nodes
-                    cerr << "special node " ;
-                    cerr << x << "/" << m << ", " << b << endl;
-
                     countthisk++;
                     countthisb++;
 
@@ -284,6 +282,13 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
                     // Nodecount[b]++ ;
 
                     thisnode = C[b] + R.prefix(x/m-lo);
+
+                    cerr << C[b] << endl;
+                    
+                    // include if you want a list of special nodes
+                    cerr << "special node " ;
+                    cerr << "(" << x << "/" << m << ", " << b << ") = " << thisnode << endl;
+                    
                     term = thisnode/m;
 
                     if (M.mu(mprime) > 0) {
