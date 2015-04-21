@@ -251,7 +251,11 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
         if (k>1 && deg == 128 && countthisk < 1000) deg = 2048;
         if (k>1 && deg == 2048 && countthisk <= 2) deg = 2097152;
 
-        RangeArray R(lo,(int)(x13+1-EP),deg);
+        //RangeArray R(lo,(int)(x13+1-EP),deg);
+        long long hi = (long long)((k+1)*x13+EP);
+        RangeArray R(lo, hi-lo, deg);
+        cerr << "lo: " << lo << " hi: " << hi << endl;
+        cerr << "RangeArray R(" << lo << ", " << hi-lo << ", " << deg << ");" << endl;
 
         countthisk = 0;
 
@@ -263,10 +267,12 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
             countthisb = 0;
 
             q = nthprime(b+1);
-            if (q > x23/(mhat*k)) break; // all done with this k
+            if (q > (x23+EP)/(mhat*k)) break; // all done with this k
 
 
-            bound = x23/((k+1.0)*q);  // check that this is OK!
+            //bound = (x23+EP)/((k+1.0)*q);  // check that this is OK!
+            bound = (1.0/hi)*x/q;
+            cerr << "bound: " << bound << endl;
 
             mprime = Nextmprime[b];
             while (mprime > bound) {  
@@ -280,10 +286,15 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
                     // bump node count map
                     // Nodecount[b]++ ;
+                    
+                    long long spot = x/m-lo;
+                    ftype prefix = R.prefix(spot);
 
-                    thisnode = C[b] + R.prefix(x/m-lo);
+                    cerr << "R.prefix(" << spot << ") = " << prefix << endl;
 
-                    cerr << C[b] << endl;
+                    thisnode = C[b] + prefix;
+
+                    cerr << "C[b]: " << C[b] << endl;
                     
                     // include if you want a list of special nodes
                     cerr << "special node " ;
@@ -309,6 +320,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
             Nextmprime[b] = mprime;
 
             C[b] += R.total();
+            cerr << "R.sift(" << q << ");" << endl;
             R.sift(q);
         }
 
