@@ -29,7 +29,7 @@ S2_main : S2_main.cpp S2.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 S2_main.cpp -lntl -lm -o S2_main
 opt : opt.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 opt.cpp -lntl -lm -o opt
-test_fullsum : test_fullsum.cpp
+test_fullsum : test_fullsum.cpp special.cpp ordinary.cpp S2.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 test_fullsum.cpp -lntl -lm -o test_fullsum
 test_special : test_special.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 test_special.cpp -lntl -lm -o test_special
