@@ -2,8 +2,6 @@
 // Uses Briggs "quad float" data type as implemented in NTL
 // About 30D accuracy
 
-// Runs in "calculator" mode.
-
 // Reference output (for checking)
 
 // x = 1e18
@@ -71,9 +69,6 @@ ftype phi_o(long long x) {
     sum,sumpos,sumneg,sumomit,sumomit2;
     
     long int N,m,count;
-    
-    // x = to_ftype(argv[1]);
-    // x = 1e18;
     
     N = to_long( floor(exp(log(x)/3)) );   // [ cube root of x ]
     

@@ -1,6 +1,7 @@
 
 // Sieve algorithm for sum over special nodes
 // Eric Bach August 2005
+// Modified to work on non-perfect cubes x - Bryce Sandlund Spring 2015
 //
 // Reference values:
 
@@ -126,8 +127,6 @@
 
 #define EP 1e-10
 
-//double mhat = 1105.0;
-
 using namespace std;
 using namespace NTL;
 
@@ -146,19 +145,35 @@ double mhat = 1;
 //   5177717 15
 //   1801241484456448000 1105
 //      for this "target" value final b = 2^21 = 2097152
+void set_mhat(long long x) {
+    if (x < 1000)
+        mhat = 1;
+    else if (x < 1000000)
+        mhat = 5;
+    else if (x < 1000000000)
+        mhat = 13;
+    else if (x < 1000000000000LL)
+        mhat = 33;
+    else if (x < 1000000000000000LL)
+        mhat = 103;
+    else if (x < 1000000000000000000LL)
+        mhat = 319;
+    else
+        mhat = 1005;
+}
 
 // a cube near 10^17 is 99999429057832312
 //         "   10^16 is  9999934692543307
 //         "   1.5e15 is 1499983322109111
-
+// Note: perfect cubes are no longer necessary
 ftype phi_s(long long x)  // transliteration of maple code in psum.m
 {                        // however we will compute a rather than bring it in
+    set_mhat(x);
     long a; 
     long i;
 
-    double x13; // exact cube root of x -- abort if not integral <- no longer do this!
+    double x13; // exact cube root of x
     x13 = pow((double)x, 1.0/3);
-//    if ((long long)x13*x13*x13 != x) { cerr << "Bad x = " << x << endl; exit(1); }
 
     double x23; // used for some bounds so we may as well compute it now
     x23 = (double)x13*x13;
@@ -249,7 +264,6 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
         if (k>1 && deg == 128 && countthisk < 1000) deg = 2048;
         if (k>1 && deg == 2048 && countthisk <= 2) deg = 2097152;
 
-        //RangeArray R(lo,(int)(x13+1-EP),deg);
         long long hi = (long long)((k+1)*x13+EP);
         RangeArray R(lo, hi-lo, deg);
         cerr << "lo: " << lo << " hi: " << hi << endl;
@@ -288,15 +302,16 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
                     long long spot = x/m-lo;
                     ftype prefix = R.prefix(spot);
 
-                    cerr << "R.prefix(" << spot << ") = " << prefix << endl;
+                    // also include to see other terms included in the paper
+                    //cerr << "R.prefix(" << spot << ") = " << prefix << endl;
 
                     thisnode = C[b] + prefix;
 
-                    cerr << "C[b]: " << C[b] << endl;
+                    //cerr << "C[b]: " << C[b] << endl;
                     
                     // include if you want a list of special nodes
-                    cerr << "special node " ;
-                    cerr << "(" << x << "/" << m << ", " << b << ") = " << thisnode << endl;
+                    //cerr << "special node " ;
+                    //cerr << "(" << x << "/" << m << ", " << b << ") = " << thisnode << endl;
                     
                     term = thisnode/m;
 
@@ -323,10 +338,10 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
         }
 
         // include if you want a count of special nodes per segment
-        if (countthisk) { 
-            cerr << "sgmt " << k << ": " << countthisk << " nodes." << endl;
+        //if (countthisk) { 
+        //    cerr << "sgmt " << k << ": " << countthisk << " nodes." << endl;
             // cerr << "total = " << total << endl;
-        }
+        //}
 
         // include if you want the node count map
         // if (countthisk) {

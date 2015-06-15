@@ -1,3 +1,7 @@
+// Computes full sum 1/p for all p <= x, inputted as a command line argument.
+// Debug output is directed to cerr. To avoid seeing it, run "./fullsum x 2> debug.out"
+// For performance-critical calculations, comment cerr lines in files below (primarily special.cpp)
+
 #include "special.cpp"
 #include "ordinary.cpp"
 #include "S2.cpp"
