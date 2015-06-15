@@ -49,12 +49,12 @@ int main(int argc, char *argv[]) {
         }
     }*/
 
-    //ll x = atoll(argv[1]);
-    //cout << calc(x) << endl;
-    
-    ll x = 5195976;
+    ll x = atoll(argv[1]);
     cout << calc(x) << endl;
-    cout << sum1p_and_s2_m1(x) + phi_o(x) + phi_s(x) << endl;
+    
+    //ll x = 5195976;
+    //cout << calc(x) << endl;
+    //cout << sum1p_and_s2_m1(x) + phi_o(x) + phi_s(x) << endl;
 
     return 0;
 }
