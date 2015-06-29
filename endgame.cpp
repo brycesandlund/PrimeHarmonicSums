@@ -19,39 +19,30 @@
 //
 // This code is pretty much straight-through.
 
+#include "utility.h"
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 #include "Primelist.h"
 
-#include <NTL/quad_float.h>  // You need the NTL prefix
 using namespace std;
 using namespace NTL;
 
-// #define START   1800000000000000000LL  -- for debugging runs
-#define START      1000020 // needs to be 0 mod 30
+//#define START   1800000000000000000LL // -- for debugging runs
+//#define START      1000020 // needs to be 0 mod 30
 
-#define BLOKSIZE 1001              // needs to be >= 4th root of START
-#define NBLOKS   1001              // can be reduced for debugging
+//#define bloksize 1001              // needs to be >= 4th root of start
+//#define nbloks   1001              // can be reduced for debugging
 
-#define PCOUNT  80000       // upper bound on pi(START ^ 1/2)
+//#define pcount  80000       // upper bound on pi(start ^ 1/2)
 
-unsigned char G[PCOUNT];   // G[0] ... G[g-1] are half-gaps between odd primes
-long g;                    // G[0] = (5-3)/2, G[1] = (7-5)/2, etc.
+//#define xint 1200000L // size of sieving interval, should be mult of 30
+//#define xsize xint/30   // actual size of the data block; must be integral
+//#define numx 100        // number of blocks this run
 
-char Sblok[BLOKSIZE];  // small segments we sieve to make the prime gaps
-unsigned int i;
 
-#define XINT 1200000L // size of sieving interval, should be mult of 30
-#define XSIZE XINT/30   // actual size of the data block; must be integral
-#define NUMX 100        // number of blocks this run
-unsigned char Xblok[XSIZE]; // bit vector, re-used
-
-int H[256], B[256];  // Hamming wt and isum tables for all possible bytes
-// If the zero bits are at positions c1,..,ck then
-// H = k and B = c1+...+ck.
-
-void HBinit()       // constructor for these tables
+void HBinit(int *H, int *B)       // constructor for these tables
 { int c, s;
     unsigned char t;
     for (c=0;c<256;c++) {
@@ -65,15 +56,13 @@ void HBinit()       // constructor for these tables
         if (!(c&0100)) {H[c]++; B[c] += 23;}
         if (!(c&0200)) {H[c]++; B[c] += 29;}
     }
-    // for (c=0;c<256;c++) cout << H[c] << " "; cout << endl << endl;
-    // for (c=0;c<256;c++) cout << B[c] << " "; cout << endl << endl;
+    // for (c=0;c<256;c++) cerr << H[c] << " "; cerr << endl << endl;
+    // for (c=0;c<256;c++) cerr << B[c] << " "; cerr << endl << endl;
 }
 
 #define WSIZE 30
-int Wrp[WSIZE];           // stripped-down size 30 wheel
-char Wshft[WSIZE];        // mod 30 to bit position encoding
 
-void Winit()  // constructor for the wheel
+void Winit(int *Wrp, char *Wshft)  // constructor for the wheel
 {
     int i;
     for (i=0;i<WSIZE;i++) Wrp[i] = 1;
@@ -90,13 +79,45 @@ void Winit()  // constructor for the wheel
     Wshft[29] = 1 << 7;
 }
 
-int main()
+// Returns an upper bound on pi(x)
+long long pi(long long x) {
+    return (long long)ceil((1.25506*x)/log(x));
+}
+
+long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
 {
-    Primelist P(BLOKSIZE);
+    int Wrp[WSIZE];           // stripped-down size 30 wheel
+    char Wshft[WSIZE];        // mod 30 to bit position encoding
+    Winit(Wrp, Wshft);
+
+    int H[256], B[256];  // Hamming wt and isum tables for all possible bytes
+    // If the zero bits are at positions c1,..,ck then
+    // H = k and B = c1+...+ck.
+    HBinit(H, B);
+
+    long long bloksize = (long long)ceil(pow(hi, .25));
+    long long xint = sqrt(hi - lo);
+    xint += (30 - xint%30);
+    long long xsize = xint/30;
+    long long nbloks = ((hi-lo)+xint-1) / xint;
+    long long numx = nbloks;
+    long long start = hi - nbloks*xint;
+    long long pcount = 1000000;
+    unsigned int i;
+    unsigned char Xblok[xsize]; // bit vector, re-used
+   
+    unsigned char G[pcount];   // G[0] ... G[g-1] are half-gaps between odd primes
+    long g;                    // G[0] = (5-3)/2, G[1] = (7-5)/2, etc.
+
+    char Sblok[bloksize];  // small segments we sieve to make the prime gaps
+
+    Primelist P(bloksize);
     long prevp, newp;
     long j, k;
     long p;
     long long offset;
+
+    cerr << "shit declared" << endl;
     
     // statistics for each block
     float fsum;
@@ -106,7 +127,7 @@ int main()
     int primecount;
     long long firstprime, lastprime, isum;
     
-    cout.precision(20);
+    cerr.precision(20);
     quad_float::SetOutputPrecision(30);
     
     // Find all gaps between "small" primes
@@ -121,55 +142,59 @@ int main()
         if (newp == P.max()) break;
     }
     
+    cerr << "here" << endl;
     // We have now found all gaps in block 0 so we can start the little sieve
     // with k=1.  This is only done once so it need not be all that efficient
     
-    offset = BLOKSIZE+1;
-    for (k=1;k<=NBLOKS;k++) {
+    offset = bloksize+1;
+    for (k=1;k<=nbloks;k++) {
         
-        // cout << "little sieve " << k << endl;
+        // cerr << "little sieve " << k << endl;
         
-        for (i=0;i<BLOKSIZE;i++) Sblok[i] = 1;
+        for (i=0;i<bloksize;i++) Sblok[i] = 1;
         
         P.reset();
         for (;;) {
             p = P.next();
             i = p - offset%p;
             if (i==p) i=0;  // inelegant but works
-            while (i<BLOKSIZE) {
+            while (i<bloksize) {
                 Sblok[i] = 0;
                 i += p;
             }
             if (p == P.max()) break;
         }
         
-        for (i=0;i<BLOKSIZE;i++) {
+        for (i=0;i<bloksize;i++) {
             if (Sblok[i]) {
                 newp = i+offset;
                 G[g++] = (newp - prevp)>>1;
                 prevp = newp;
             }
         }
-        offset += BLOKSIZE;
+        offset += bloksize;
     }
     
-    cout << "Prime table size: " << g << endl;
-    cout << "Max prime from table: " << newp << endl;
+    cerr << "Prime table size: " << g << endl;
+    cerr << "Max prime from table: " << newp << endl;
     
     // now we sieve blocks of large numbers
     
-    HBinit();
-    Winit();
-    
-    offset = START; // this and XSIZE should be multiples of 30
-    for (k=0;k<NUMX;k++) {
+    vector<long long> offsetA(numx);
+    vector<long long> firstprimeA(numx);
+    vector<long long> countA(numx);
+    vector<long long> isumA(numx);
+
+    offset = start; // this and xsize should be multiples of 30
+    for (k=0;k<numx;k++) {
         
         if (offset%30) {
-            cout << "bad offset " << offset << endl;
+            cerr << "bad offset " << offset << endl;
+            cerr << "should be 0 mod 30, but is " << offset%30 << " mod 30" << endl;
             exit(1);
         }
         
-        for (i=0;i<XSIZE;i++) Xblok[i] = 0;
+        for (i=0;i<xsize;i++) Xblok[i] = 0;
         
         j = 2; // we skip 2,3,5
         p = 7;
@@ -179,15 +204,15 @@ int main()
             i = p - offset%p;
             if (i==p) i=0;
             if (i%2 == 0) i += p;
-            while (i<XINT) {
+            while (i<xint) {
                 if (Wrp[i%30]) Xblok[i/30] |= Wshft[i%30];
                 i += p2;
             }
             p = p + 2*G[j++];
         }
         
-        cout << endl;
-        cout << "finished sieving block " << k << endl;
+        cerr << endl;
+        cerr << "finished sieving block " << k << endl;
         
         i=0; // find the first prime in the sieved interval
         while (Xblok[i] == 255) i++;
@@ -209,21 +234,42 @@ int main()
             firstprime = offset + 30*i + t;
         }
         
-        cout << "offset " << offset << endl;
-        cout << "first prime at " << firstprime << endl;
-        
+        cerr << "offset " << offset << endl;
+        offsetA[k] = offset;
+        cerr << "first prime at " << firstprime << endl;
+        firstprimeA[k] = firstprime;
+
         primecount = 0; // get coeffs for sum of 1/p
         isum = 0;
-        for (i=0;i<XSIZE;i++) {
+        for (i=0;i<xsize;i++) {
             if (Xblok[i] == 255) continue;
             primecount += H[Xblok[i]];
             isum += (30*(long long)i)*H[Xblok[i]] + B[Xblok[i]];
         }
         
-        cout << "prime count " << primecount << endl;
-        cout << "sum of i's " << isum << endl;
+        cerr << "prime count " << primecount << endl;
+        countA[k] = primecount;
+        cerr << "sum of i's " << isum << endl;
+        isumA[k] = isum;
         
-        offset += XINT;
+
+        offset += xint;
     }
+    
+    ftype cumulative = sum;
+    
+    for (long long k = numx-1; k >= 0; --k) {
+        ftype offset_float = to_quad_float(offsetA[k]);
+
+        ftype sum1p = countA[k]/offset_float - isumA[k]/(offset_float*offset_float);
+        cumulative -= sum1p;
+        cerr << "cumulative: " << cumulative << " offset: " << offsetA[k] << endl;
+        if (cumulative < goal) {
+            sum = cumulative+sum1p;
+            return offsetA[k+1];
+        }
+    }
+    
     return 0;
 }
+

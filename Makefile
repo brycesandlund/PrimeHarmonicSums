@@ -17,8 +17,8 @@ ordhi : ordhi.cpp
 	g++ -I$(IDIR) -L$(LDIR) ordhi.cpp -lntl -lm -o ordhi
 endgamehi : endgamehi.cpp
 	g++ -I$(IDIR) -L$(LDIR) endgamehi.cpp -lntl -lm -o endgamehi
-endgame : endgame.cpp
-	g++ -I$(IDIR) -L$(LDIR) -O3 endgame.cpp -lntl -lm -o endgame
+endgame_main : endgame_main.cpp endgame.cpp
+	g++ -I$(IDIR) -L$(LDIR) -O3 endgame_main.cpp -lntl -lm -o endgame_main
 special_main : special.cpp special_main.cpp RangeArray.h Primefns.h
 	g++ -I$(IDIR) -L$(LDIR) special_main.cpp -O3 -lntl -lm -o special_main
 ordinary_main : ordinary_main.cpp ordinary.cpp
@@ -29,11 +29,19 @@ S2_main : S2_main.cpp S2.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 S2_main.cpp -lntl -lm -o S2_main
 opt : opt.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 opt.cpp -lntl -lm -o opt
-test_fullsum : test_fullsum.cpp special.cpp ordinary.cpp S2.cpp
+test_fullsum : test_fullsum.cpp special.cpp ordinary.cpp S2.cpp RangeArray.h Primefns.h
 	g++ -I$(IDIR) -L$(LDIR) -O3 test_fullsum.cpp -lntl -lm -o test_fullsum
 test_special : test_special.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 test_special.cpp -lntl -lm -o test_special
+test_endgame : test_endgame.cpp endgame.cpp
+	g++ -I$(IDIR) -L$(LDIR) -O3 test_endgame.cpp -lntl -lm -o test_endgame
 shn : shn.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 shn.cpp -lntl -lm -o shn
 fullsum : fullsum.cpp RangeArray.h special.cpp ordinary.cpp S2.cpp Primefns.h
 	g++ -I$(IDIR) -L$(LDIR) -O3 fullsum.cpp -lntl -lm -o fullsum
+crossover : crossover.cpp RangeArray.h special.cpp ordinary.cpp S2.cpp Primefns.h endgame.cpp
+	g++ -I$(IDIR) -L$(LDIR) -O3 crossover.cpp -lntl -lm -o crossover
+blocksieve_main : blocksieve.cpp blocksieve_main
+	g++ -I$(IDIR) -L$(LDIR) -O3 blocksieve_main.cpp -lntl -lm -o blocksieve_main
+sinterval : sinterval.cpp
+	g++ -I$(IDIR) -L$(LDIR) -O3 sinterval.cpp -lntl -lm -o sinterval

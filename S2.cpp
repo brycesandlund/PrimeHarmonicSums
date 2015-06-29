@@ -4,19 +4,13 @@
 
 #include <NTL/quad_float.h>
 #include "Primelist.h"
+#include "utility.h"
 
 #define EP 1e-10
 
 using namespace std;
 using namespace NTL;
 
-quad_float to_quad_float(long long n)
-{
-    char s[30];
-    sprintf(s,"%lld%c",n,0);
-    //cerr << n << " " << s << endl;
-    return to_quad_float(s);
-}
 
 Bitvector B;
 long long lft, rt=0;
