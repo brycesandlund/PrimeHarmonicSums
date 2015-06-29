@@ -2,6 +2,7 @@
 // Sieve algorithm for sum over special nodes
 // Eric Bach August 2005
 // Modified to work on non-perfect cubes x - Bryce Sandlund Spring 2015
+// Note that this is the most computationally expensive part of the whole algorithm
 //
 // Reference values:
 
@@ -112,19 +113,16 @@
 // 7/30 developed some "theory" for how to set tree degrees.
 // For details see opt.cpp in this directory
 
+#include "utility.h"    // NTL prefix and high-precision floating point is handled here
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
-
-#include <NTL/quad_float.h>  // You need the NTL prefix
-//  #include <NTL/RR.h>  // If using RR -- remember to fix RangeArray.h too
 
 #include "Primelist.h"
 
 #include "Primefns.h"
 
-#include "RangeArray.h"  // includes defn of ftype 
-
+#include "RangeArray.h"
 #define EP 1e-10
 
 using namespace std;
@@ -162,10 +160,7 @@ void set_mhat(long long x) {
         mhat = 1005;
 }
 
-// a cube near 10^17 is 99999429057832312
-//         "   10^16 is  9999934692543307
-//         "   1.5e15 is 1499983322109111
-// Note: perfect cubes are no longer necessary
+// Returns the contribution of special nodes for sum 1/p for all p <= x
 ftype phi_s(long long x)  // transliteration of maple code in psum.m
 {                        // however we will compute a rather than bring it in
     set_mhat(x);

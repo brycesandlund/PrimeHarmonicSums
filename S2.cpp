@@ -1,10 +1,8 @@
 // S2
-//
-// The user inputs x, and this program computes S2.
+// Computes S2 and other sums (currently in the same function)
 
-#include <NTL/quad_float.h>
-#include "Primelist.h"
 #include "utility.h"
+#include "Primelist.h"
 
 #define EP 1e-10
 
@@ -14,9 +12,9 @@ using namespace NTL;
 
 Bitvector B;
 long long lft, rt=0;
-quad_float qf_left;
+ftype qf_left;
 long pos=0;
-quad_float x; quad_float cuberootx; quad_float sqrtx;
+ftype x; ftype cuberootx; ftype sqrtx;
 Primelist P;
 
 void sieve(long long newleft)
@@ -37,7 +35,7 @@ void sieve(long long newleft)
     }
 }
 
-quad_float nextprime()
+ftype nextprime()
 {
     if(rt==0) { sieve(to_long(floor(sqrtx))+1); }
     else if(pos>=B.length()) sieve(rt+1);
@@ -49,9 +47,10 @@ quad_float nextprime()
     return (qf_left+(pos-1));
 }
 
-quad_float sum1p_and_s2_m1(long long input) {
+// Returns the contribution of sum 1/p p <= largest prime less than x^(1/3) minus S2 minus 1
+ftype sum1p_and_s2_m1(long long input) {
     cuberootx = to_quad_float(exp(log(input)/3));
-    quad_float::SetOutputPrecision(30);
+    ftype::SetOutputPrecision(30);
 
     x = cuberootx * cuberootx * cuberootx;
     cerr << "x = " << x << endl;
@@ -71,7 +70,7 @@ quad_float sum1p_and_s2_m1(long long input) {
     //cerr << endl;
     //return 0;
 
-    quad_float sum, sum1, sum2, sum1p;
+    ftype sum, sum1, sum2, sum1p;
     sum=0;
     long i;
 
@@ -86,13 +85,13 @@ quad_float sum1p_and_s2_m1(long long input) {
     sum1=0;
     sum2=0;
     long qpos=P.length()-1;
-    quad_float q;
+    ftype q;
     q=nextprime(); // smallest prime >= sqrtx
     cerr << "First prime >= sqrtx : " << q << endl;
 
     for( i=P.length()-1; i>a; i--)
     {
-        quad_float p;
+        ftype p;
         p=to_quad_float(P[i]);
         //cerr << "p=" << p << endl;
         // going down from sqrtx:

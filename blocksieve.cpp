@@ -68,6 +68,7 @@ bool is_prime(T n) {
     return true;
 }
 
+// Returns the first prime x in which sum 1/p p <= x crosses target
 long long find_crossover(ftype s, ftype target, long long lo, long long hi) {
     quad_float::SetOutputPrecision(40);
     for (long long p = hi; p >= lo; --p) {

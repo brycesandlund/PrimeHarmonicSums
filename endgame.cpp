@@ -29,19 +29,6 @@
 using namespace std;
 using namespace NTL;
 
-//#define START   1800000000000000000LL // -- for debugging runs
-//#define START      1000020 // needs to be 0 mod 30
-
-//#define bloksize 1001              // needs to be >= 4th root of start
-//#define nbloks   1001              // can be reduced for debugging
-
-//#define pcount  80000       // upper bound on pi(start ^ 1/2)
-
-//#define xint 1200000L // size of sieving interval, should be mult of 30
-//#define xsize xint/30   // actual size of the data block; must be integral
-//#define numx 100        // number of blocks this run
-
-
 void HBinit(int *H, int *B)       // constructor for these tables
 { int c, s;
     unsigned char t;
@@ -79,11 +66,8 @@ void Winit(int *Wrp, char *Wshft)  // constructor for the wheel
     Wshft[29] = 1 << 7;
 }
 
-// Returns an upper bound on pi(x)
-long long pi(long long x) {
-    return (long long)ceil((1.25506*x)/log(x));
-}
-
+// Returns the offset of the block in which the sum crosses the goal value
+// Updates sum according to where the offset left off
 long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
 {
     int Wrp[WSIZE];           // stripped-down size 30 wheel
@@ -95,14 +79,17 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     // H = k and B = c1+...+ck.
     HBinit(H, B);
 
-    long long bloksize = (long long)ceil(pow(hi, .25));
-    long long xint = sqrt(hi - lo);
-    xint += (30 - xint%30);
+    long long bloksize = (long long)ceil(pow(hi, .25));     // size of blok, should be >= 4th root of start
+    long long xint = sqrt(hi - lo);     // size of sieving interval, should be multiple of 30
+    xint += (30 - xint%30);             // actual size of the data block; must be integral
     long long xsize = xint/30;
-    long long nbloks = ((hi-lo)+xint-1) / xint;
-    long long numx = nbloks;
-    long long start = hi - nbloks*xint;
-    long long pcount = 1000000;
+    long long nbloks = ((hi-lo)+xint-1) / xint;     // number of blocks we expect to do
+    long long numx = nbloks;                        // number of blocks this run - can be made smaller than nbloks to debug
+    long long start = hi - nbloks*xint;     // where to start the sieve
+    long long pcount = 1000000;     // should be an upper bound on pi(start^(1/2))
+                                    // this isn't large enough though, and the value is only used
+                                    // for the size of a large array, so can be made as large as possible
+                                    // within memory constraints.
     unsigned int i;
     unsigned char Xblok[xsize]; // bit vector, re-used
    

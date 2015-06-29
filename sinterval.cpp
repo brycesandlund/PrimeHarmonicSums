@@ -1,6 +1,12 @@
+// Estimates lower and upper bounds on the Schoenfeld interval.
+// This is accomplished by binary searching for z in the equation log(log(z)) + C +- err
+// Where err is the error term that upper and lower bounds sum 1/p
+// This only works when x is <= 10^100 (anything higher is impractical), and is done
+// With a special feq method that uses absolute and relative error.
+
+#include "utility.h"
 #include <iostream>
 #include <cmath>
-#include <NTL/quad_float.h>
 
 #define C 0.261497212847642783755426838609
 

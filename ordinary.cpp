@@ -16,11 +16,10 @@
 // Timings: 4.57 sec on jalapeno (Athlon XP1800+),
 //          6.08 sec on euler (Coppermine PIII)
 
+#include "utility.h"
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
-
-#include <NTL/quad_float.h>  // You need the NTL prefix
 
 using namespace std;
 using namespace NTL;
@@ -28,8 +27,6 @@ using namespace NTL;
 #include "Primelist.h"
 
 #define SIZE 2000000
-
-typedef quad_float ftype;
 
 int mu[SIZE];  // I know, this should use a class ...
 
@@ -54,6 +51,7 @@ void muinit(int N)
     }
 }
 
+// Returns the contribution of ordinary nodes for sum 1/p for all p <= x
 ftype phi_o(long long x) {
     ftype gamma, log2;
     gamma = to_quad_float("0.57721566490153286060651209008240243");

@@ -1,3 +1,6 @@
+// Computes first prime x where sum 1/p p <= x crosses y, inputted as a command line argument.
+// If preferred, these pieces can be run individually via their respective _main programs.
+
 #include "utility.h"
 #include "special.cpp"
 #include "ordinary.cpp"
@@ -35,8 +38,6 @@ int main(int argc, char *argv[]) {
         long long xhi = (long long)conv<double>(ceil(find_z(y, false)));
         xhi += (30 - xhi%30);
         cerr << xlo << " " << xhi << endl;
-        
-        //long long xavg = (long long)conv<double>((xhi+xlow)/2);
         
         ftype special = phi_s(xhi);
         cout << "phi_s: " << special << endl;

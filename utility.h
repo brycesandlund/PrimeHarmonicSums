@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <NTL/quad_float.h>
+//  #include <NTL/RR.h>  // If using RR -- remember to fix RangeArray.h too
 
 using namespace std;
 using namespace NTL;

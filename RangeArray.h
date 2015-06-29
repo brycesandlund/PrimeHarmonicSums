@@ -29,20 +29,17 @@
 #ifndef _RANGEARRAY
 #define _RANGEARRAY
 
-using namespace std;
+#include "utility.h"
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
 
-// #include <NTL/quad_float.h>  // You need the NTL prefix
-#include <NTL/RR.h>  // You need the NTL prefix
-using namespace NTL;
-
 #include "Primelist.h"
 
-typedef quad_float ftype;
-
 #define recip(x) 1.0/(x)
+
+using namespace std;
+using namespace NTL;
 
 class RangeArray  // sieveable array w/ fast prefix sum capability
 {                 // the leaf for t = offset+i has the value 1/t
