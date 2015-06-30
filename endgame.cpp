@@ -80,20 +80,20 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     HBinit(H, B);
 
     long long bloksize = (long long)ceil(pow(hi, .25));     // size of blok, should be >= 4th root of start
-    long long xint = sqrt(hi - lo);     // size of sieving interval, should be multiple of 30
+    long long xint = pow(hi - lo, 2.0/3);     // size of sieving interval, should be multiple of 30
     xint += (30 - xint%30);             // actual size of the data block; must be integral
     long long xsize = xint/30;
     long long nbloks = ((hi-lo)+xint-1) / xint;     // number of blocks we expect to do
     long long numx = nbloks;                        // number of blocks this run - can be made smaller than nbloks to debug
     long long start = hi - nbloks*xint;     // where to start the sieve
-    long long pcount = 1000000;     // should be an upper bound on pi(start^(1/2))
+    long long pcount = 100000000;     // should be an upper bound on pi(start^(1/2))
                                     // this isn't large enough though, and the value is only used
                                     // for the size of a large array, so can be made as large as possible
                                     // within memory constraints.
     unsigned int i;
     unsigned char Xblok[xsize]; // bit vector, re-used
    
-    unsigned char G[pcount];   // G[0] ... G[g-1] are half-gaps between odd primes
+    unsigned char *G = new unsigned char[pcount];   // G[0] ... G[g-1] are half-gaps between odd primes
     long g;                    // G[0] = (5-3)/2, G[1] = (7-5)/2, etc.
 
     char Sblok[bloksize];  // small segments we sieve to make the prime gaps
@@ -103,8 +103,6 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     long j, k;
     long p;
     long long offset;
-
-    cerr << "shit declared" << endl;
     
     // statistics for each block
     float fsum;
@@ -129,7 +127,6 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
         if (newp == P.max()) break;
     }
     
-    cerr << "here" << endl;
     // We have now found all gaps in block 0 so we can start the little sieve
     // with k=1.  This is only done once so it need not be all that efficient
     
@@ -246,14 +243,19 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     ftype cumulative = sum;
     
     for (long long k = numx-1; k >= 0; --k) {
-        ftype offset_float = to_quad_float(offsetA[k]);
+        ftype offset_float = to_ftype(offsetA[k]);
+
+        if (offset_float == 0) {
+            sum = cumulative;
+            return offsetA[k] + xint;
+        }
 
         ftype sum1p = countA[k]/offset_float - isumA[k]/(offset_float*offset_float);
         cumulative -= sum1p;
         cerr << "cumulative: " << cumulative << " offset: " << offsetA[k] << endl;
         if (cumulative < goal) {
             sum = cumulative+sum1p;
-            return offsetA[k+1];
+            return offsetA[k] + xint;
         }
     }
     

@@ -123,7 +123,6 @@
 #include "Primefns.h"
 
 #include "RangeArray.h"
-#define EP 1e-10
 
 using namespace std;
 using namespace NTL;

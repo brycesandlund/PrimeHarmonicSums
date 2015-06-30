@@ -39,9 +39,9 @@ shn : shn.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 shn.cpp -lntl -lm -o shn
 fullsum : fullsum.cpp RangeArray.h special.cpp ordinary.cpp S2.cpp Primefns.h
 	g++ -I$(IDIR) -L$(LDIR) -O3 fullsum.cpp -lntl -lm -o fullsum
-crossover : crossover.cpp RangeArray.h special.cpp ordinary.cpp S2.cpp Primefns.h endgame.cpp
+crossover : crossover.cpp RangeArray.h special.cpp ordinary.cpp S2.cpp Primefns.h endgame.cpp sinterval.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 crossover.cpp -lntl -lm -o crossover
 blocksieve_main : blocksieve.cpp blocksieve_main
 	g++ -I$(IDIR) -L$(LDIR) -O3 blocksieve_main.cpp -lntl -lm -o blocksieve_main
-sinterval : sinterval.cpp
-	g++ -I$(IDIR) -L$(LDIR) -O3 sinterval.cpp -lntl -lm -o sinterval
+sinterval_main : sinterval_main.cpp
+	g++ -I$(IDIR) -L$(LDIR) -O3 sinterval_main.cpp -lntl -lm -o sinterval_main

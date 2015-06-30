@@ -9,6 +9,7 @@
 #include <cmath>
 
 #define C 0.261497212847642783755426838609
+#define E 4
 
 using namespace std;
 using namespace NTL;
@@ -25,14 +26,18 @@ bool feq(ftype a, ftype b) {
     return false;
 }
 
+ftype get_value(ftype z, bool lower) {
+    ftype err = (3*log(z)+4) / (8*M_PI*sqrt(z));
+    return log(log(z)) + C + (lower ? err : -err);
+}
+
 ftype find_z(ftype y, bool lower) {
-    ftype lo = to_quad_float(0.0);
-    ftype hi = to_quad_float(1e100);
+    ftype lo = to_ftype(0.0);
+    ftype hi = to_ftype(1e100);
 
     while (!feq(lo, hi)) {
         ftype z = (hi+lo) / 2;
-        ftype err = (3*log(z)+4) / (8*M_PI*sqrt(z));
-        ftype value = log(log(z)) + C + (lower ? err : -err);
+        ftype value = get_value(z, lower);
         if (value > y) {
             hi = z;
         }
@@ -41,8 +46,8 @@ ftype find_z(ftype y, bool lower) {
         }
     }
 
-    if (lower)
-        return lo;
+    if (lower)  // E term necessary for small crossovers. Won't have performance impact for large
+        return lo-E;
     else
-        return hi;
+        return hi+E;
 }

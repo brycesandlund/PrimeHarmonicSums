@@ -4,25 +4,16 @@
 #include "utility.h"
 #include "Primelist.h"
 
-#define EP 1e-10
-
 using namespace std;
 using namespace NTL;
 
 
-Bitvector B;
-long long lft, rt=0;
-ftype qf_left;
-long pos=0;
-ftype x; ftype cuberootx; ftype sqrtx;
-Primelist P;
-
-void sieve(long long newleft)
+void sieve(long long newleft, Bitvector &B, ftype &qf_left, long long &lft, long long &rt, Primelist &P, long &pos)
 {
     //cerr << "\nSieving...\n";
     pos=0;
     lft=newleft;
-    qf_left=to_quad_float(lft);
+    qf_left=to_ftype(lft);
     rt=lft+B.length()-1;
     B.setall();
     double sqrtrt = sqrt((double)rt);
@@ -35,21 +26,28 @@ void sieve(long long newleft)
     }
 }
 
-ftype nextprime()
+ftype nextprime(Bitvector &B, ftype &qf_left, long long &lft, long long &rt, Primelist &P, long &pos, ftype &sqrtx)
 {
-    if(rt==0) { sieve(to_long(floor(sqrtx))+1); }
-    else if(pos>=B.length()) sieve(rt+1);
+    if(rt==0) { sieve(to_long(floor(sqrtx))+1, B, qf_left, lft, rt, P, pos); }
+    else if(pos>=B.length()) sieve(rt+1, B, qf_left, lft, rt, P, pos);
 
     while(pos<B.length() && !B[pos]) pos++;
 
-    if(pos>=B.length()) return nextprime();
+    if(pos>=B.length()) return nextprime(B, qf_left, lft, rt, P, pos, sqrtx);
     pos++;
     return (qf_left+(pos-1));
 }
 
 // Returns the contribution of sum 1/p p <= largest prime less than x^(1/3) minus S2 minus 1
 ftype sum1p_and_s2_m1(long long input) {
-    cuberootx = to_quad_float(exp(log(input)/3));
+    Bitvector B;
+    long long lft, rt=0;
+    ftype qf_left;
+    long pos=0;
+    ftype x; ftype cuberootx; ftype sqrtx;
+    Primelist P;
+
+    cuberootx = to_ftype(exp(log(input)/3));
     ftype::SetOutputPrecision(30);
 
     x = cuberootx * cuberootx * cuberootx;
@@ -60,7 +58,7 @@ ftype sum1p_and_s2_m1(long long input) {
 
     long maxp = to_long(floor(sqrtx));
     P.find(maxp);
-    if(!P) { cerr << "Error: unable to allocate space.\n"; return to_quad_float("0"); }
+    if(!P) { cerr << "Error: unable to allocate space.\n"; return to_ftype(0); }
 
     B.setsize(to_long(floor(cuberootx)));
 
@@ -75,30 +73,30 @@ ftype sum1p_and_s2_m1(long long input) {
     long i;
 
     sum1p=0;
-    for(i=0; i < P.length() && P[i] <= floor(cuberootx); i++) sum1p += 1/to_quad_float(P[i]);
+    for(i=0; i < P.length() && P[i] <= floor(cuberootx); i++) sum1p += 1/to_ftype(P[i]);
     long a=i-1;
     cerr << "a=" << a << " P[a]=" << P[a] << endl;
     cerr << "sum 1/p up to p_a = " << sum1p << endl;
-    cerr << "log log pa + B = " << to_double(log(log(to_quad_float(P[a])))
-            +to_quad_float(0.26149)) << endl << endl;
+    cerr << "log log pa + B = " << to_double(log(log(to_ftype(P[a])))
+            +to_ftype(0.26149)) << endl << endl;
 
     sum1=0;
     sum2=0;
     long qpos=P.length()-1;
     ftype q;
-    q=nextprime(); // smallest prime >= sqrtx
+    q=nextprime(B, qf_left, lft, rt, P, pos, sqrtx); // smallest prime >= sqrtx
     cerr << "First prime >= sqrtx : " << q << endl;
 
     for( i=P.length()-1; i>a; i--)
     {
         ftype p;
-        p=to_quad_float(P[i]);
+        p=to_ftype(P[i]);
         //cerr << "p=" << p << endl;
         // going down from sqrtx:
         sum1 += 1/p;
 
         // going up from sqrtx:
-        while(q<=x/p) { sum2+=1/q; q=nextprime(); }
+        while(q<=x/p) { sum2+=1/q; q=nextprime(B, qf_left, lft, rt, P, pos, sqrtx); }
 
         sum += (sum1+sum2)/p;
     }
@@ -106,7 +104,7 @@ ftype sum1p_and_s2_m1(long long input) {
     cerr << "sum2=" << sum2 << endl;
     cerr << "sum1+sum2=" << sum1+sum2 << endl;
     cerr << "log log x/p_a - log log p_a ="
-        << log(log(x/to_quad_float(P[a]))) - log(log(to_quad_float(P[a]))) 
+        << log(log(x/to_ftype(P[a]))) - log(log(to_ftype(P[a]))) 
         << endl;
     cerr << "S2=" << sum << endl;
     cerr << "-1-S2+(sum 1/p up to p_a) = " << -1-sum+sum1p << endl;

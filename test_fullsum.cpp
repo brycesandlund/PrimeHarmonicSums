@@ -1,3 +1,4 @@
+#include "utility.h"
 #include <iostream>
 #include <cmath>
 #include <iomanip>
@@ -5,37 +6,67 @@
 #include "ordinary.cpp"
 #include "S2.cpp"
 
+#define NUM 100
+#define STEP 10000000
+
 using namespace std;
 
-#define EP 1e-10
 
-typedef long long ll;
-
-bool isPrime(ll n) {
-    for (ll i = 2; i <= sqrt(n)+EP; ++i) {
-        if (n % i == 0)
-            return false;
-    }
-
-    return true;
-}
-
-double calc(ll x) {
-    double sum = 0;
-    for (ll i = x; i >= 2; --i) {
-        if (isPrime(i)) {
-            sum += 1.0 / i;
+bool * get_primes(long long x) {
+    bool *prime = new bool[x+1];
+    memset(prime, true, (x+1)*sizeof(bool));
+    prime[0] = false;
+    prime[1] = false;
+    for (long long i = 2; i*i <= x; ++i) {
+        if (prime[i]) {
+            for (long long j = i*i; j <= x; j+=i) {
+                prime[j] = false;
+            }
         }
     }
-    
+    return prime;
+}
+
+// finds prime harmonic sum via sieve and naive computation
+ftype calc(long long start, long long end, bool *prime) {
+    ftype sum = to_ftype(0);
+    for (long long i = end; i >= start; --i) {
+        if (prime[i]) {
+            sum += to_ftype(1)/i;
+        }
+    }
     return sum;
+}
+
+void test_fullsum(long long start) {
+    bool *prime = get_primes(NUM*STEP + start);
+    ftype naive = calc(0, start-STEP, prime);
+    ftype last = to_ftype(-1);
+    for (long long i = start; i < NUM*STEP + start; i += STEP) {
+        naive += calc(i-STEP+1, i, prime);
+        ftype total = phi_o(i) + phi_s(i) + sum1p_and_s2_m1(i);
+        if (fabs(total - naive) > to_ftype(EP)) {
+            cout << "naive and calculated off" << endl;
+        }
+        else {
+            cout << "naive and calculated correct" << endl;
+        }
+        cout << "naive: " << naive << endl;
+        cout << "calculated: " << total << endl;
+        if (last != -1 && last - total > EP) {
+            cout << "total went down" << endl;
+        }
+        last = total;
+    }
 }
 
 int main(int argc, char *argv[]) {
     cout << setprecision(20);
     cout << fixed;
 
-    ll x = atoll(argv[1]);
-    cout << calc(x) << endl;
+    long long x = atoll(argv[1]);
+    quad_float::SetOutputPrecision(30);
+    //test_fullsum(x);
+    cout << calc(0, x, get_primes(x)) << endl;
     return 0;
 }
