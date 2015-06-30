@@ -260,8 +260,8 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
         long long hi = (long long)((k+1)*x13+EP);
         RangeArray R(lo, hi-lo, deg);
-        cerr << "lo: " << lo << " hi: " << hi << endl;
-        cerr << "RangeArray R(" << lo << ", " << hi-lo << ", " << deg << ");" << endl;
+        //cerr << "lo: " << lo << " hi: " << hi << endl;
+        //cerr << "RangeArray R(" << lo << ", " << hi-lo << ", " << deg << ");" << endl;
 
         countthisk = 0;
 
@@ -278,7 +278,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
             //bound = (x23+EP)/((k+1.0)*q);  // check that this is OK!
             bound = (1.0/hi)*x/q;
-            cerr << "bound: " << bound << endl;
+         //   cerr << "bound: " << bound << endl;
 
             mprime = Nextmprime[b];
             while (mprime > bound) {  
@@ -287,37 +287,41 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
                     m = (long long) mprime*q;
 
-                    countthisk++;
-                    countthisb++;
+                    // this check becomes necessary because hi may be higher than we actually want to go,
+                    // due to the rounding issues when x is not a perfect cube
+                    if (m > x13 +EP) {
 
-                    // bump node count map
-                    // Nodecount[b]++ ;
-                    
-                    long long spot = x/m-lo;
-                    ftype prefix = R.prefix(spot);
+                        countthisk++;
+                        countthisb++;
 
-                    // also include to see other terms included in the paper
-                    //cerr << "R.prefix(" << spot << ") = " << prefix << endl;
+                        // bump node count map
+                        // Nodecount[b]++ ;
+                        
+                        long long spot = x/m-lo;
+                        ftype prefix = R.prefix(spot);
 
-                    thisnode = C[b] + prefix;
+                        // also include to see other terms included in the paper
+                        //cerr << "R.prefix(" << spot << ") = " << prefix << endl;
 
-                    //cerr << "C[b]: " << C[b] << endl;
-                    
-                    // include if you want a list of special nodes
-                    //cerr << "special node " ;
-                    //cerr << "(" << x << "/" << m << ", " << b << ") = " << thisnode << endl;
-                    
-                    term = thisnode/m;
+                        thisnode = C[b] + prefix;
 
-                    if (M.mu(mprime) > 0) {
-                        totalneg += term;
-                        total -= term;
+                        //cerr << "C[b]: " << C[b] << endl;
+                        
+                        // include if you want a list of special nodes
+                        cerr << "special node " ;
+                        cerr << "(" << x << "/" << m << ", " << b << ") = " << thisnode << endl;
+                        
+                        term = thisnode/m;
+
+                        if (M.mu(mprime) > 0) {
+                            totalneg += term;
+                            total -= term;
+                        }
+                        else {
+                            totalpos += term;
+                            total += term;
+                        }
                     }
-                    else {
-                        totalpos += term;
-                        total += term;
-                    }
-
                 }
 
                 mprime--;  // iterating thru odds makes very little difference
@@ -327,7 +331,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
             Nextmprime[b] = mprime;
 
             C[b] += R.total();
-            cerr << "R.sift(" << q << ");" << endl;
+        //    cerr << "R.sift(" << q << ");" << endl;
             R.sift(q);
         }
 

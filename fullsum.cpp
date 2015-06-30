@@ -42,19 +42,6 @@ int main(int argc, char *argv[]) {
 
         ftype total = special + ordinary + rest;
         cout << "total: " << total << endl;
-        
-
-        special = phi_s(x);
-        cout << "phi_s: " << special << endl;
-
-        ordinary = phi_o(x);
-        cout << "phi_o: " << ordinary << endl;
-
-        rest = sum1p_and_s2_m1(x);
-        cout << "rest: " << rest << endl;
-
-        total = special + ordinary + rest;
-        cout << "total: " << total << endl;
     }
 
     return 0;

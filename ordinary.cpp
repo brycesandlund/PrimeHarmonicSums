@@ -54,8 +54,8 @@ void muinit(int N)
 // Returns the contribution of ordinary nodes for sum 1/p for all p <= x
 ftype phi_o(long long x) {
     ftype gamma, log2;
-    gamma = to_quad_float("0.57721566490153286060651209008240243");
-    log2 =  to_quad_float("0.69314718055994530941723212145817657");
+    gamma = to_ftype("0.57721566490153286060651209008240243");
+    log2 =  to_ftype("0.69314718055994530941723212145817657");
     ftype::SetOutputPrecision(30);
     
     Primelist P(SIZE);
