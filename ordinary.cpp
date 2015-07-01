@@ -44,7 +44,8 @@ void muinit(int N)
     P.reset();
     for (;;) {
         p = P.next();
-        //  -- DEBUG -- cerr << "p = " << p << endl;
+        if (DEBUG)
+            cerr << "p = " << p << endl;
         for(i = p;i<N;i+=p) mu[i] = -mu[i];
         if (p <= S) for(i = p*p;i<N;i+= p*p) mu[i] = 0;
         if (p == P.max()) break;
@@ -70,9 +71,11 @@ ftype phi_o(long long x) {
     
     N = to_long( floor(exp(log(x)/3)) );   // [ cube root of x ]
     
-    cerr << x << endl;
-    cerr << N << endl;
-    
+    if (DEBUG) {
+        cerr << x << endl;
+        cerr << N << endl;
+    }
+
     sum = 0;
     sumpos = 0;
     sumneg = 0;
@@ -93,14 +96,16 @@ ftype phi_o(long long x) {
         sumomit2 += 8*mu[m]/(63*m*y6);
         count++;
     }
-    
-    cerr << count << " ordinary nodes." << endl;
-    cerr << " sum of positive terms = " << sumpos << endl;
-    cerr << " sum of negative terms = " << sumneg << endl;
-    cerr << " sum = " << sum << endl;
-    cerr << " inconsistency : " << sum - (sumpos - sumneg) << endl;
-    cerr << " sum of first term omitted = " << sumomit << endl;
-    cerr << " sum of next after that= " << sumomit2 << endl;
+   
+    if (DEBUG) { 
+        cerr << count << " ordinary nodes." << endl;
+        cerr << " sum of positive terms = " << sumpos << endl;
+        cerr << " sum of negative terms = " << sumneg << endl;
+        cerr << " sum = " << sum << endl;
+        cerr << " inconsistency : " << sum - (sumpos - sumneg) << endl;
+        cerr << " sum of first term omitted = " << sumomit << endl;
+        cerr << " sum of next after that= " << sumomit2 << endl;
+    }
 
     return sum;
 }

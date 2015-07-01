@@ -43,8 +43,10 @@ void HBinit(int *H, int *B)       // constructor for these tables
         if (!(c&0100)) {H[c]++; B[c] += 23;}
         if (!(c&0200)) {H[c]++; B[c] += 29;}
     }
-    // for (c=0;c<256;c++) cerr << H[c] << " "; cerr << endl << endl;
-    // for (c=0;c<256;c++) cerr << B[c] << " "; cerr << endl << endl;
+    if (DEBUG) {
+       for (c=0;c<256;c++) cerr << H[c] << " "; cerr << endl << endl;
+       for (c=0;c<256;c++) cerr << B[c] << " "; cerr << endl << endl;
+    }
 }
 
 #define WSIZE 30
@@ -133,7 +135,8 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     offset = bloksize+1;
     for (k=1;k<=nbloks;k++) {
         
-        // cerr << "little sieve " << k << endl;
+        if (DEBUG)
+            cerr << "little sieve " << k << endl;
         
         for (i=0;i<bloksize;i++) Sblok[i] = 1;
         
@@ -159,9 +162,10 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
         offset += bloksize;
     }
     
-    cerr << "Prime table size: " << g << endl;
-    cerr << "Max prime from table: " << newp << endl;
-    
+    if (DEBUG) {
+        cerr << "Prime table size: " << g << endl;
+        cerr << "Max prime from table: " << newp << endl;
+    }
     // now we sieve blocks of large numbers
     
     vector<long long> offsetA(numx);
@@ -195,9 +199,11 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
             p = p + 2*G[j++];
         }
         
-        cerr << endl;
-        cerr << "finished sieving block " << k << endl;
-        
+        if (DEBUG) {
+            cerr << endl;
+            cerr << "finished sieving block " << k << endl;
+        }
+
         i=0; // find the first prime in the sieved interval
         while (Xblok[i] == 255) i++;
         { int s, t;
@@ -218,9 +224,12 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
             firstprime = offset + 30*i + t;
         }
         
-        cerr << "offset " << offset << endl;
+        if (DEBUG)
+            cerr << "offset " << offset << endl;
         offsetA[k] = offset;
-        cerr << "first prime at " << firstprime << endl;
+        
+        if (DEBUG)
+            cerr << "first prime at " << firstprime << endl;
         firstprimeA[k] = firstprime;
 
         primecount = 0; // get coeffs for sum of 1/p
@@ -231,9 +240,12 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
             isum += (30*(long long)i)*H[Xblok[i]] + B[Xblok[i]];
         }
         
-        cerr << "prime count " << primecount << endl;
+        if (DEBUG)
+            cerr << "prime count " << primecount << endl;
         countA[k] = primecount;
-        cerr << "sum of i's " << isum << endl;
+        
+        if (DEBUG)
+            cerr << "sum of i's " << isum << endl;
         isumA[k] = isum;
         
 
@@ -252,7 +264,8 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
 
         ftype sum1p = countA[k]/offset_float - isumA[k]/(offset_float*offset_float);
         cumulative -= sum1p;
-        cerr << "cumulative: " << cumulative << " offset: " << offsetA[k] << endl;
+        if (DEBUG)
+            cerr << "cumulative: " << cumulative << " offset: " << offsetA[k] << endl;
         if (cumulative < goal) {
             sum = cumulative+sum1p;
             return offsetA[k] + xint;

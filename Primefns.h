@@ -21,7 +21,8 @@ class Mulist  // table of Mobius function
             Primelist P(size);
             for (i=1;i<=size;i++) M[i] = 1;
             S = (int) sqrt((double)size);
-            cerr << "Mulist: size = " << size << " S = " << S << endl;
+            if (DEBUG)
+                cerr << "Mulist: size = " << size << " S = " << S << endl;
 
             P.reset();
             for (;;) {

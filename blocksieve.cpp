@@ -13,12 +13,14 @@ long long find_crossover(ftype s, ftype target, long long lo, long long hi) {
     quad_float::SetOutputPrecision(40);
     for (long long p = hi; p >= lo; --p) {
         if(is_prime(p)) {
-            cerr << "Sum 1/p for p <= " << p << ": " << s << endl;
+            if (DEBUG)
+                cerr << "Sum 1/p for p <= " << p << ": " << s << endl;
             s -= 1.0/p;
             if (s < target) {
                 for (long long p2 = p-1; p2 >= lo; --p2) {
                     if (is_prime(p2)) {
-                        cerr << "Sum 1/p for p <= " << p2 << ": " << s << endl;
+                        if (DEBUG)
+                            cerr << "Sum 1/p for p <= " << p2 << ": " << s << endl;
                         return p;
                     }
                 }

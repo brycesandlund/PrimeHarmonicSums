@@ -1,11 +1,12 @@
 #ifndef _UTILITY
 #define _UTILITY
 
+#define DEBUG 0
 #define EP 1e-20
 
 #include <cstdio>
-#include <NTL/quad_float.h>
-//  #include <NTL/RR.h>  // If using RR -- remember to fix RangeArray.h too
+//#include <NTL/quad_float.h>
+#include <NTL/RR.h>  // If using RR -- remember to fix RangeArray.h too
 
 using namespace std;
 using namespace NTL;
@@ -16,7 +17,6 @@ ftype to_ftype(long long n)
 {
     char s[30];
     sprintf(s,"%lld%c",n,0);
-    //cerr << n << " " << s << endl;
     return to_quad_float(s);
 }
 
@@ -28,7 +28,7 @@ ftype to_ftype(int n) {
     return to_quad_float(n);
 }
 
-ftype to_ftype(char* n) {
+ftype to_ftype(const char* n) {
     return to_quad_float(n);
 }
 

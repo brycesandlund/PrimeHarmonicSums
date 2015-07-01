@@ -181,22 +181,29 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
     cerr << setprecision(18);
     quad_float::SetOutputPrecision(30);
 
-    cerr << "x = " << x << endl;
-    cerr << "x13 = " << x13 << endl;
-    cerr << "x23 = " << x23 << endl;
-    cerr << "a = " << a << endl;
-    cerr << "pa = " << pa << endl;
+    if (DEBUG) {
+        cerr << "x = " << x << endl;
+        cerr << "x13 = " << x13 << endl;
+        cerr << "x23 = " << x23 << endl;
+        cerr << "a = " << a << endl;
+        cerr << "pa = " << pa << endl;
+    }
 
     ftype *C;  // cumulative sum array
     long b;    // index for primes
     C = new ftype[a-1];
     for (b=1;b<=a-2;b++) C[b] = 0;
-    cerr << "C done." << endl; 
+    if (DEBUG)
+        cerr << "C done." << endl; 
 
     Mulist M((int)(x13+1-EP)); // table of Mobius function (computed correctly)
-    cerr << "M done." << endl; 
+    
+    if (DEBUG)
+        cerr << "M done." << endl; 
     Spflist S((int)(x13+1-EP)); // table of smallest prime factor
-    cerr << "S done." << endl; 
+    
+    if (DEBUG)
+        cerr << "S done." << endl; 
 
     long *Mprimetable; // lists smallest prime factor for odd squarefree numbers
     Mprimetable = new long[(int)(x13+1+EP)];
@@ -208,17 +215,22 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
         else Mprimetable[i] = 0;
     }
 
-    cerr << "Mprimetable done." << endl; 
+    if (DEBUG)
+        cerr << "Mprimetable done." << endl; 
 
     long long Mchek;
     Mchek = 0;
     for (i=1;i<=x13+EP;i++) Mchek += Mprimetable[i];
-    cerr << "Mprimetable check sum = " << Mchek << endl; 
+    
+    if (DEBUG)
+        cerr << "Mprimetable check sum = " << Mchek << endl; 
 
     long *Nextmprime;
     Nextmprime = new long[a-1];
     for (b=1;b<=a-2;b++) Nextmprime[b] = x13;
-    cerr << "Nextmprime done." << endl; 
+    
+    if (DEBUG)
+        cerr << "Nextmprime done." << endl; 
 
     // include if you want the node count map
     // long *Nodecount; Nodecount = new long[a-1];
@@ -247,7 +259,8 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
         // Efficiency not worth it here since we are in the outer loop
         if (k==1) {
-            cerr << "Initial sift done." << endl;
+            if (DEBUG)
+                cerr << "Initial sift done." << endl;
             deg = 4;
         }
 
@@ -260,8 +273,11 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
         long long hi = (long long)((k+1)*x13+EP);
         RangeArray R(lo, hi-lo, deg);
-        //cerr << "lo: " << lo << " hi: " << hi << endl;
-        //cerr << "RangeArray R(" << lo << ", " << hi-lo << ", " << deg << ");" << endl;
+        
+        if (DEBUG) {
+            cerr << "lo: " << lo << " hi: " << hi << endl;
+            cerr << "RangeArray R(" << lo << ", " << hi-lo << ", " << deg << ");" << endl;
+        }
 
         countthisk = 0;
 
@@ -276,9 +292,10 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
             if (q > (x23+EP)/(mhat*k)) break; // all done with this k
 
 
-            //bound = (x23+EP)/((k+1.0)*q);  // check that this is OK!
             bound = (1.0/hi)*x/q;
-         //   cerr << "bound: " << bound << endl;
+            
+            if (DEBUG)
+                cerr << "bound: " << bound << endl;
 
             mprime = Nextmprime[b];
             while (mprime > bound) {  
@@ -301,16 +318,20 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
                         ftype prefix = R.prefix(spot);
 
                         // also include to see other terms included in the paper
-                        //cerr << "R.prefix(" << spot << ") = " << prefix << endl;
+                        if (DEBUG)
+                            cerr << "R.prefix(" << spot << ") = " << prefix << endl;
 
                         thisnode = C[b] + prefix;
 
-                        //cerr << "C[b]: " << C[b] << endl;
+                        if (DEBUG)
+                            cerr << "C[b]: " << C[b] << endl;
                         
                         // include if you want a list of special nodes
-                        cerr << "special node " ;
-                        cerr << "(" << x << "/" << m << ", " << b << ") = " << thisnode << endl;
-                        
+                        if (DEBUG) {
+                            cerr << "special node " ;
+                            cerr << "(" << x << "/" << m << ", " << b << ") = " << thisnode << endl;
+                        }
+
                         term = thisnode/m;
 
                         if (M.mu(mprime) > 0) {
@@ -331,7 +352,8 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
             Nextmprime[b] = mprime;
 
             C[b] += R.total();
-        //    cerr << "R.sift(" << q << ");" << endl;
+            if (DEBUG)
+                cerr << "R.sift(" << q << ");" << endl;
             R.sift(q);
         }
 
@@ -352,19 +374,21 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
     }
 
-    cerr << "x = " << x << endl;
+    if (DEBUG) {
+        cerr << "x = " << x << endl;
 
-    cerr << specialcount << " special nodes." << endl;
+        cerr << specialcount << " special nodes." << endl;
 
-    cerr << "LMO estimate = " << (double)a*a/2 << endl;
-    // Note: this estimate is basically pairs p>q with p*q > x^(1/3)
+        cerr << "LMO estimate = " << (double)a*a/2 << endl;
+        // Note: this estimate is basically pairs p>q with p*q > x^(1/3)
 
-    cerr << "actual/estimate = " << specialcount/ ( (double)a*a/2 ) << endl;
+        cerr << "actual/estimate = " << specialcount/ ( (double)a*a/2 ) << endl;
 
-    cerr << "total positive terms = " << totalpos << endl;
-    cerr << "total negative terms = " << totalneg << endl;
-    cerr << "               total = " << total << endl;
-    cerr << "         discrepancy = " << total - (totalpos - totalneg) << endl;
+        cerr << "total positive terms = " << totalpos << endl;
+        cerr << "total negative terms = " << totalneg << endl;
+        cerr << "               total = " << total << endl;
+        cerr << "         discrepancy = " << total - (totalpos - totalneg) << endl;
+    }
 
     return total;
 }

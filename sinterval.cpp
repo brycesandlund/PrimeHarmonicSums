@@ -14,8 +14,6 @@
 using namespace std;
 using namespace NTL;
 
-typedef quad_float ftype;
-
 const double EPS_ABS = 1e-10;
 const double EPS_REL = 1e-10;
 

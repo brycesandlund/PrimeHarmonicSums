@@ -10,7 +10,8 @@ using namespace NTL;
 
 void sieve(long long newleft, Bitvector &B, ftype &qf_left, long long &lft, long long &rt, Primelist &P, long &pos)
 {
-    //cerr << "\nSieving...\n";
+    if (DEBUG)
+        cerr << "\nSieving...\n";
     pos=0;
     lft=newleft;
     qf_left=to_ftype(lft);
@@ -51,10 +52,13 @@ ftype sum1p_and_s2_m1(long long input) {
     ftype::SetOutputPrecision(30);
 
     x = cuberootx * cuberootx * cuberootx;
-    cerr << "x = " << x << endl;
-    cerr << "cube root = " << cuberootx << endl;
+    if (DEBUG) {
+        cerr << "x = " << x << endl;
+        cerr << "cube root = " << cuberootx << endl;
+    }
     sqrtx = sqrt(x);
-    cerr << "sqrt = " << sqrtx << endl;
+    if (DEBUG)
+        cerr << "sqrt = " << sqrtx << endl;
 
     long maxp = to_long(floor(sqrtx));
     P.find(maxp);
@@ -75,23 +79,28 @@ ftype sum1p_and_s2_m1(long long input) {
     sum1p=0;
     for(i=0; i < P.length() && P[i] <= floor(cuberootx); i++) sum1p += 1/to_ftype(P[i]);
     long a=i-1;
-    cerr << "a=" << a << " P[a]=" << P[a] << endl;
-    cerr << "sum 1/p up to p_a = " << sum1p << endl;
-    cerr << "log log pa + B = " << to_double(log(log(to_ftype(P[a])))
-            +to_ftype(0.26149)) << endl << endl;
+    if (DEBUG) {
+        cerr << "a=" << a << " P[a]=" << P[a] << endl;
+        cerr << "sum 1/p up to p_a = " << sum1p << endl;
+        cerr << "log log pa + B = " << to_double(log(log(to_ftype(P[a])))
+                +to_ftype(0.26149)) << endl << endl;
+    }
 
     sum1=0;
     sum2=0;
     long qpos=P.length()-1;
     ftype q;
     q=nextprime(B, qf_left, lft, rt, P, pos, sqrtx); // smallest prime >= sqrtx
-    cerr << "First prime >= sqrtx : " << q << endl;
+    if (DEBUG)
+        cerr << "First prime >= sqrtx : " << q << endl;
 
     for( i=P.length()-1; i>a; i--)
     {
         ftype p;
         p=to_ftype(P[i]);
-        //cerr << "p=" << p << endl;
+        
+        if (DEBUG)
+            cerr << "p=" << p << endl;
         // going down from sqrtx:
         sum1 += 1/p;
 
@@ -100,13 +109,15 @@ ftype sum1p_and_s2_m1(long long input) {
 
         sum += (sum1+sum2)/p;
     }
-    cerr << "sum1=" << sum1 << endl;
-    cerr << "sum2=" << sum2 << endl;
-    cerr << "sum1+sum2=" << sum1+sum2 << endl;
-    cerr << "log log x/p_a - log log p_a ="
-        << log(log(x/to_ftype(P[a]))) - log(log(to_ftype(P[a]))) 
-        << endl;
-    cerr << "S2=" << sum << endl;
-    cerr << "-1-S2+(sum 1/p up to p_a) = " << -1-sum+sum1p << endl;
+    if (DEBUG) {
+        cerr << "sum1=" << sum1 << endl;
+        cerr << "sum2=" << sum2 << endl;
+        cerr << "sum1+sum2=" << sum1+sum2 << endl;
+        cerr << "log log x/p_a - log log p_a ="
+            << log(log(x/to_ftype(P[a]))) - log(log(to_ftype(P[a]))) 
+            << endl;
+        cerr << "S2=" << sum << endl;
+        cerr << "-1-S2+(sum 1/p up to p_a) = " << -1-sum+sum1p << endl;
+    }
     return -1-sum+sum1p;
 }

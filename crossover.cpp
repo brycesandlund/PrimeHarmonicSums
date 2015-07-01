@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
         usage(argv[0]);
     }
     else {
-        ftype y = to_quad_float(argv[1]);
+        ftype y = to_ftype(argv[1]);
 
         long long crossover;
         if (y <= 0) {
@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
 
             long long block_crossover = schofeld_crossover(total, y, xlo, xhi);
             crossover = find_crossover(total, y, xlo, block_crossover);
+        //    crossover = find_crossover(total, y, xlo, xhi);
         }
 
         cout << "Sum 1/p for p <= " << crossover << " is the smallest prime x with sum 1/p <= x > " << y << endl;
