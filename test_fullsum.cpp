@@ -12,21 +12,6 @@
 using namespace std;
 
 
-bool * get_primes(long long x) {
-    bool *prime = new bool[x+1];
-    memset(prime, true, (x+1)*sizeof(bool));
-    prime[0] = false;
-    prime[1] = false;
-    for (long long i = 2; i*i <= x; ++i) {
-        if (prime[i]) {
-            for (long long j = i*i; j <= x; j+=i) {
-                prime[j] = false;
-            }
-        }
-    }
-    return prime;
-}
-
 // finds prime harmonic sum via sieve and naive computation
 ftype calc(long long start, long long end, bool *prime) {
     ftype sum = to_ftype(0);

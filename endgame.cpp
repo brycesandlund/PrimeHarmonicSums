@@ -43,7 +43,7 @@ void HBinit(int *H, int *B)       // constructor for these tables
         if (!(c&0100)) {H[c]++; B[c] += 23;}
         if (!(c&0200)) {H[c]++; B[c] += 29;}
     }
-    if (DEBUG) {
+    if (DEBUG_EG) {
        for (c=0;c<256;c++) cerr << H[c] << " "; cerr << endl << endl;
        for (c=0;c<256;c++) cerr << B[c] << " "; cerr << endl << endl;
     }
@@ -81,7 +81,9 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     // H = k and B = c1+...+ck.
     HBinit(H, B);
 
-    long long bloksize = (long long)ceil(pow(hi, .25));     // size of blok, should be >= 4th root of start
+    long long bloksize = (long long)ceil(pow(hi, 1.0/3));     // size of blok, should be >= 4th root of start
+                                                           // again, this value needs to actually be larger
+                                                           //
     long long xint = pow(hi - lo, 2.0/3);     // size of sieving interval, should be multiple of 30
     xint += (30 - xint%30);             // actual size of the data block; must be integral
     long long xsize = xint/30;
@@ -98,7 +100,7 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     unsigned char *G = new unsigned char[pcount];   // G[0] ... G[g-1] are half-gaps between odd primes
     long g;                    // G[0] = (5-3)/2, G[1] = (7-5)/2, etc.
 
-    char Sblok[bloksize];  // small segments we sieve to make the prime gaps
+    char *Sblok = new char[bloksize];  // small segments we sieve to make the prime gaps
 
     Primelist P(bloksize);
     long prevp, newp;
@@ -135,7 +137,7 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     offset = bloksize+1;
     for (k=1;k<=nbloks;k++) {
         
-        if (DEBUG)
+        if (DEBUG_EG)
             cerr << "little sieve " << k << endl;
         
         for (i=0;i<bloksize;i++) Sblok[i] = 1;
@@ -162,7 +164,7 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
         offset += bloksize;
     }
     
-    if (DEBUG) {
+    if (DEBUG_EG) {
         cerr << "Prime table size: " << g << endl;
         cerr << "Max prime from table: " << newp << endl;
     }
@@ -199,7 +201,7 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
             p = p + 2*G[j++];
         }
         
-        if (DEBUG) {
+        if (DEBUG_EG) {
             cerr << endl;
             cerr << "finished sieving block " << k << endl;
         }
@@ -224,11 +226,11 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
             firstprime = offset + 30*i + t;
         }
         
-        if (DEBUG)
+        if (DEBUG_EG)
             cerr << "offset " << offset << endl;
         offsetA[k] = offset;
         
-        if (DEBUG)
+        if (DEBUG_EG)
             cerr << "first prime at " << firstprime << endl;
         firstprimeA[k] = firstprime;
 
@@ -240,11 +242,11 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
             isum += (30*(long long)i)*H[Xblok[i]] + B[Xblok[i]];
         }
         
-        if (DEBUG)
+        if (DEBUG_EG)
             cerr << "prime count " << primecount << endl;
         countA[k] = primecount;
         
-        if (DEBUG)
+        if (DEBUG_EG)
             cerr << "sum of i's " << isum << endl;
         isumA[k] = isum;
         
@@ -264,7 +266,7 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
 
         ftype sum1p = countA[k]/offset_float - isumA[k]/(offset_float*offset_float);
         cumulative -= sum1p;
-        if (DEBUG)
+        if (DEBUG_EG)
             cerr << "cumulative: " << cumulative << " offset: " << offsetA[k] << endl;
         if (cumulative < goal) {
             sum = cumulative+sum1p;

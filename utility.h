@@ -2,6 +2,7 @@
 #define _UTILITY
 
 #define DEBUG 0
+#define DEBUG_EG 1
 #define EP 1e-20
 
 #include <cstdio>
@@ -93,6 +94,21 @@ bool is_prime(T n) {
             return false;
     }
     return true;
+}
+
+bool * get_primes(long long x) {
+    bool *prime = new bool[x+1];
+    memset(prime, true, (x+1)*sizeof(bool));
+    prime[0] = false;
+    prime[1] = false;
+    for (long long i = 2; i*i <= x; ++i) {
+        if (prime[i]) {
+            for (long long j = i*i; j <= x; j+=i) {
+                prime[j] = false;
+            }
+        }
+    }
+    return prime;
 }
 
 
