@@ -44,7 +44,7 @@ void muinit(int N)
     P.reset();
     for (;;) {
         p = P.next();
-        if (DEBUG)
+        if (DEBUG_OD)
             cerr << "p = " << p << endl;
         for(i = p;i<N;i+=p) mu[i] = -mu[i];
         if (p <= S) for(i = p*p;i<N;i+= p*p) mu[i] = 0;
@@ -71,7 +71,7 @@ ftype phi_o(long long x) {
     
     N = to_long( floor(exp(log(x)/3)) );   // [ cube root of x ]
     
-    if (DEBUG) {
+    if (DEBUG_OD) {
         cerr << x << endl;
         cerr << N << endl;
     }
@@ -97,7 +97,7 @@ ftype phi_o(long long x) {
         count++;
     }
    
-    if (DEBUG) { 
+    if (DEBUG_OD) { 
         cerr << count << " ordinary nodes." << endl;
         cerr << " sum of positive terms = " << sumpos << endl;
         cerr << " sum of negative terms = " << sumneg << endl;

@@ -83,8 +83,7 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
 
     long long bloksize = (long long)ceil(pow(hi, 1.0/3));     // size of blok, should be >= 4th root of start
                                                            // again, this value needs to actually be larger
-                                                           //
-    long long xint = pow(hi - lo, 2.0/3);     // size of sieving interval, should be multiple of 30
+    long long xint = pow(hi - lo, 3.0/4);     // size of sieving interval, should be multiple of 30
     xint += (30 - xint%30);             // actual size of the data block; must be integral
     long long xsize = xint/30;
     long long nbloks = ((hi-lo)+xint-1) / xint;     // number of blocks we expect to do

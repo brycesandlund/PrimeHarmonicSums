@@ -17,6 +17,7 @@ using namespace NTL;
 const double EPS_ABS = 1e-10;
 const double EPS_REL = 1e-10;
 
+// Returns true if ftype a and b are within an absolute or relative error of 1e-10
 bool feq(ftype a, ftype b) {
     ftype d = fabs(b-a);
     if (d <= EPS_ABS) return true;
@@ -24,11 +25,13 @@ bool feq(ftype a, ftype b) {
     return false;
 }
 
+// Returns an upper and lower bound for the sum 1/p p <= z
 ftype get_value(ftype z, bool lower) {
     ftype err = (3*log(z)+4) / (8*M_PI*sqrt(z));
     return log(log(z)) + C + (lower ? err : -err);
 }
 
+// Binary searches for lower and upper bounds on z in sum 1/p p <= z = y
 ftype find_z(ftype y, bool lower) {
     ftype lo = to_ftype(0.0);
     ftype hi = to_ftype(1e100);

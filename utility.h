@@ -2,12 +2,15 @@
 #define _UTILITY
 
 #define DEBUG 0
-#define DEBUG_EG 1
+#define DEBUG_SP 0
+#define DEBUG_OD 0
+#define DEBUG_S2 0
+#define DEBUG_EG 0
 #define EP 1e-20
 
 #include <cstdio>
-//#include <NTL/quad_float.h>
-#include <NTL/RR.h>  // If using RR -- remember to fix RangeArray.h too
+#include <NTL/quad_float.h>
+//#include <NTL/RR.h>  // If using RR. Changing functions here applies to all files
 
 using namespace std;
 using namespace NTL;

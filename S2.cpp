@@ -10,7 +10,7 @@ using namespace NTL;
 
 void sieve(long long newleft, Bitvector &B, ftype &qf_left, long long &lft, long long &rt, Primelist &P, long &pos)
 {
-    if (DEBUG)
+    if (DEBUG_S2)
         cerr << "\nSieving...\n";
     pos=0;
     lft=newleft;
@@ -52,12 +52,12 @@ ftype sum1p_and_s2_m1(long long input) {
     ftype::SetOutputPrecision(30);
 
     x = cuberootx * cuberootx * cuberootx;
-    if (DEBUG) {
+    if (DEBUG_S2) {
         cerr << "x = " << x << endl;
         cerr << "cube root = " << cuberootx << endl;
     }
     sqrtx = sqrt(x);
-    if (DEBUG)
+    if (DEBUG_S2)
         cerr << "sqrt = " << sqrtx << endl;
 
     long maxp = to_long(floor(sqrtx));
@@ -79,7 +79,7 @@ ftype sum1p_and_s2_m1(long long input) {
     sum1p=0;
     for(i=0; i < P.length() && P[i] <= floor(cuberootx); i++) sum1p += 1/to_ftype(P[i]);
     long a=i-1;
-    if (DEBUG) {
+    if (DEBUG_S2) {
         cerr << "a=" << a << " P[a]=" << P[a] << endl;
         cerr << "sum 1/p up to p_a = " << sum1p << endl;
         cerr << "log log pa + B = " << to_double(log(log(to_ftype(P[a])))
@@ -91,7 +91,7 @@ ftype sum1p_and_s2_m1(long long input) {
     long qpos=P.length()-1;
     ftype q;
     q=nextprime(B, qf_left, lft, rt, P, pos, sqrtx); // smallest prime >= sqrtx
-    if (DEBUG)
+    if (DEBUG_S2)
         cerr << "First prime >= sqrtx : " << q << endl;
 
     for( i=P.length()-1; i>a; i--)
@@ -99,7 +99,7 @@ ftype sum1p_and_s2_m1(long long input) {
         ftype p;
         p=to_ftype(P[i]);
         
-        if (DEBUG)
+        if (DEBUG_S2)
             cerr << "p=" << p << endl;
         // going down from sqrtx:
         sum1 += 1/p;
@@ -109,7 +109,7 @@ ftype sum1p_and_s2_m1(long long input) {
 
         sum += (sum1+sum2)/p;
     }
-    if (DEBUG) {
+    if (DEBUG_S2) {
         cerr << "sum1=" << sum1 << endl;
         cerr << "sum2=" << sum2 << endl;
         cerr << "sum1+sum2=" << sum1+sum2 << endl;

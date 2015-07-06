@@ -181,7 +181,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
     cerr << setprecision(18);
     quad_float::SetOutputPrecision(30);
 
-    if (DEBUG) {
+    if (DEBUG_SP) {
         cerr << "x = " << x << endl;
         cerr << "x13 = " << x13 << endl;
         cerr << "x23 = " << x23 << endl;
@@ -193,16 +193,16 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
     long b;    // index for primes
     C = new ftype[a-1];
     for (b=1;b<=a-2;b++) C[b] = 0;
-    if (DEBUG)
+    if (DEBUG_SP)
         cerr << "C done." << endl; 
 
     Mulist M((int)(x13+1-EP)); // table of Mobius function (computed correctly)
     
-    if (DEBUG)
+    if (DEBUG_SP)
         cerr << "M done." << endl; 
     Spflist S((int)(x13+1-EP)); // table of smallest prime factor
     
-    if (DEBUG)
+    if (DEBUG_SP)
         cerr << "S done." << endl; 
 
     long *Mprimetable; // lists smallest prime factor for odd squarefree numbers
@@ -215,21 +215,21 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
         else Mprimetable[i] = 0;
     }
 
-    if (DEBUG)
+    if (DEBUG_SP)
         cerr << "Mprimetable done." << endl; 
 
     long long Mchek;
     Mchek = 0;
     for (i=1;i<=x13+EP;i++) Mchek += Mprimetable[i];
     
-    if (DEBUG)
+    if (DEBUG_SP)
         cerr << "Mprimetable check sum = " << Mchek << endl; 
 
     long *Nextmprime;
     Nextmprime = new long[a-1];
     for (b=1;b<=a-2;b++) Nextmprime[b] = x13;
     
-    if (DEBUG)
+    if (DEBUG_SP)
         cerr << "Nextmprime done." << endl; 
 
     // include if you want the node count map
@@ -259,7 +259,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
         // Efficiency not worth it here since we are in the outer loop
         if (k==1) {
-            if (DEBUG)
+            if (DEBUG_SP)
                 cerr << "Initial sift done." << endl;
             deg = 4;
         }
@@ -274,7 +274,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
         long long hi = (long long)((k+1)*x13+EP);
         RangeArray R(lo, hi-lo, deg);
         
-        if (DEBUG) {
+        if (DEBUG_SP) {
             cerr << "lo: " << lo << " hi: " << hi << endl;
             cerr << "RangeArray R(" << lo << ", " << hi-lo << ", " << deg << ");" << endl;
         }
@@ -294,7 +294,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
             bound = (1.0/hi)*x/q;
             
-            if (DEBUG)
+            if (DEBUG_SP)
                 cerr << "bound: " << bound << endl;
 
             mprime = Nextmprime[b];
@@ -318,16 +318,16 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
                         ftype prefix = R.prefix(spot);
 
                         // also include to see other terms included in the paper
-                        if (DEBUG)
+                        if (DEBUG_SP)
                             cerr << "R.prefix(" << spot << ") = " << prefix << endl;
 
                         thisnode = C[b] + prefix;
 
-                        if (DEBUG)
+                        if (DEBUG_SP)
                             cerr << "C[b]: " << C[b] << endl;
                         
                         // include if you want a list of special nodes
-                        if (DEBUG) {
+                        if (DEBUG_SP) {
                             cerr << "special node " ;
                             cerr << "(" << x << "/" << m << ", " << b << ") = " << thisnode << endl;
                         }
@@ -352,7 +352,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
             Nextmprime[b] = mprime;
 
             C[b] += R.total();
-            if (DEBUG)
+            if (DEBUG_SP)
                 cerr << "R.sift(" << q << ");" << endl;
             R.sift(q);
         }
@@ -374,7 +374,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
 
     }
 
-    if (DEBUG) {
+    if (DEBUG_SP) {
         cerr << "x = " << x << endl;
 
         cerr << specialcount << " special nodes." << endl;

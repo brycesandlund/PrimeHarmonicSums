@@ -2,6 +2,6 @@
 #include "sinterval.cpp"
 
 int main() {
-    cout << find_z(to_ftype(3.5), true) << endl;
+    cout << find_z(to_ftype(4.1666667), true) << endl;
     return 0;
 }
