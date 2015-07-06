@@ -94,12 +94,17 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     long long start = hi - numx*xint;                   // where to start the sieve
     
 
-    long long bloksize = max((long long)ceil(pow(start, 1.0/4)), 6LL);     // size of block for little sieve
-    long long nbloks = (long long)ceil(pow(start, 1.0/4));     // number of blocks for little sieve
-                                                            // nbloks*bloksize must be >= hi^(1.0/4)
+    long long bloksize = max((long long)ceil(pow(hi, 1.0/4)), 5LL);     // size of block for little sieve
+    long long nbloks = max((long long)ceil(pow(hi, 1.0/4)), 5LL);     // number of blocks for little sieve
+                                                            // nbloks*bloksize must be >= hi^(1.0/2)
+                                                            // value can't be "too small", so take max of it with 5 
     long long pcount = pi_x_upper(nbloks*bloksize);     // should be an upper bound on pi(nbloks*bloksize)
                                                         // note that this should be pi(hi^(1/2))
-    
+   
+    if (DEBUG_EG) {
+        cerr << "nbloks: " << nbloks << endl;
+        cerr << "bloksize: " << bloksize << endl; 
+    }
     unsigned int i;
     unsigned char Xblok[xsize]; // bit vector, re-used
    
@@ -109,6 +114,8 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     char *Sblok = new char[bloksize];  // small segments we sieve to make the prime gaps
 
     Primelist P(bloksize);
+    if (DEBUG_EG)
+        cerr << "P.max(): " << P.max() << endl;
     long prevp, newp;
     long j, k;
     long p;
@@ -118,12 +125,12 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     float fsum;
     double dsum;
     long double ldsum;
-    quad_float qfsum, offinv;
+    ftype qfsum, offinv;
     int primecount;
     long long firstprime, lastprime, isum;
     
     cerr.precision(20);
-    quad_float::SetOutputPrecision(30);
+    ftype::SetOutputPrecision(30);
     
     // Find all gaps between "small" primes
     
@@ -144,12 +151,14 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     
     // We have now found all gaps in block 0 so we can start the little sieve
     // with k=1.  This is only done once so it need not be all that efficient
-   
-    cerr << bloksize*nbloks << endl;
-    cerr << pi_x_upper(bloksize*nbloks) << endl;
+  
+    if (DEBUG_EG) {
+        cerr << "bloksize*nbloks: " << bloksize*nbloks << endl;
+        cerr << "upper bound on pi(bloksize*nbloks): " << pi_x_upper(bloksize*nbloks) << endl;
+    }
 
     offset = bloksize+1;
-    for (k=1;k<=nbloks;k++) {
+    for (k=1;k<nbloks;k++) {    //changed 7/6/15 to '<' rather than '<='
         
         if (DEBUG_EG)
             cerr << "little sieve " << k << endl;
@@ -181,9 +190,11 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
         }
         offset += bloksize;
     }
-    
-    cerr << "Prime table size: " << g << endl;
-    cerr << "Max prime from table: " << newp << endl;
+   
+    if (DEBUG_EG) { 
+        cerr << "Prime table size: " << g << endl;
+        cerr << "Max prime from table: " << newp << endl;
+    }
     // now we sieve blocks of large numbers
     
     vector<long long> offsetA(numx);
