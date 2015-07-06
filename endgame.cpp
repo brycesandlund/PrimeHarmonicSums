@@ -68,6 +68,10 @@ void Winit(int *Wrp, char *Wshft)  // constructor for the wheel
     Wshft[29] = 1 << 7;
 }
 
+long long pi_x_upper(long long x) {
+    return (long long)ceil((1.25506 * x)/log(x));
+}
+
 // Returns the offset of the block in which the sum crosses the goal value
 // Updates sum according to where the offset left off
 long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
@@ -81,18 +85,21 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     // H = k and B = c1+...+ck.
     HBinit(H, B);
 
-    long long bloksize = (long long)ceil(pow(hi, 1.0/3));     // size of blok, should be >= 4th root of start
-                                                           // again, this value needs to actually be larger
-    long long xint = pow(hi - lo, 3.0/4);     // size of sieving interval, should be multiple of 30
-    xint += (30 - xint%30);             // actual size of the data block; must be integral
-    long long xsize = xint/30;
-    long long nbloks = ((hi-lo)+xint-1) / xint;     // number of blocks we expect to do
-    long long numx = nbloks;                        // number of blocks this run - can be made smaller than nbloks to debug
-    long long start = hi - nbloks*xint;     // where to start the sieve
-    long long pcount = 100000000;     // should be an upper bound on pi(start^(1/2))
-                                    // this isn't large enough though, and the value is only used
-                                    // for the size of a large array, so can be made as large as possible
-                                    // within memory constraints.
+    
+    long long xint = (long long)pow(hi - lo, 3.0/4);     // size of sieving interval in large sieve, should be multiple of 30
+    xint += (30 - xint%30);                             // best performance is achieved when xint is as large as possible
+                                                        // without running out of memory.
+    long long xsize = xint/30;                          // actual size of the data block; must be integral
+    long long numx = (hi - lo + xint-1) / xint;         // number of intervals to sieve in large sieve
+    long long start = hi - numx*xint;                   // where to start the sieve
+    
+
+    long long bloksize = max((long long)ceil(pow(start, 1.0/4)), 6LL);     // size of block for little sieve
+    long long nbloks = (long long)ceil(pow(start, 1.0/4));     // number of blocks for little sieve
+                                                            // nbloks*bloksize must be >= hi^(1.0/4)
+    long long pcount = pi_x_upper(nbloks*bloksize);     // should be an upper bound on pi(nbloks*bloksize)
+                                                        // note that this should be pi(hi^(1/2))
+    
     unsigned int i;
     unsigned char Xblok[xsize]; // bit vector, re-used
    
@@ -125,6 +132,11 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     prevp = P.next();
     for (;;) {
         newp = P.next();
+        if (g >= pcount) {
+            cerr << "ERROR, pcount too small" << endl;
+            cerr << "pcount: " << pcount << ", g: " << g << endl;
+            cerr << "P.max(): " << P.max() << ", bloksize: " << bloksize << endl;
+        }
         G[g++] = (newp - prevp)>>1;
         prevp = newp;
         if (newp == P.max()) break;
@@ -132,7 +144,10 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
     
     // We have now found all gaps in block 0 so we can start the little sieve
     // with k=1.  This is only done once so it need not be all that efficient
-    
+   
+    cerr << bloksize*nbloks << endl;
+    cerr << pi_x_upper(bloksize*nbloks) << endl;
+
     offset = bloksize+1;
     for (k=1;k<=nbloks;k++) {
         
@@ -156,6 +171,10 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
         for (i=0;i<bloksize;i++) {
             if (Sblok[i]) {
                 newp = i+offset;
+                if (g >= pcount) {
+                    cerr << "ERROR, pcount too small" << endl;
+                    cerr << "pcount: " << pcount << ", g: " << g << endl;
+                }
                 G[g++] = (newp - prevp)>>1;
                 prevp = newp;
             }
@@ -163,10 +182,8 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
         offset += bloksize;
     }
     
-    if (DEBUG_EG) {
-        cerr << "Prime table size: " << g << endl;
-        cerr << "Max prime from table: " << newp << endl;
-    }
+    cerr << "Prime table size: " << g << endl;
+    cerr << "Max prime from table: " << newp << endl;
     // now we sieve blocks of large numbers
     
     vector<long long> offsetA(numx);
@@ -198,6 +215,11 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
                 i += p2;
             }
             p = p + 2*G[j++];
+            
+            if (j >= pcount) {
+                cerr << "ERROR, pcount too small" << endl;
+                cerr << "pcount: " << pcount << ", j: " << j << endl;
+            }
         }
         
         if (DEBUG_EG) {
