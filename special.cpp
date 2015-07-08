@@ -355,6 +355,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
             if (DEBUG_SP)
                 cerr << "R.sift(" << q << ");" << endl;
             R.sift(q);
+
         }
 
         // include if you want a count of special nodes per segment
@@ -371,7 +372,7 @@ ftype phi_s(long long x)  // transliteration of maple code in psum.m
         // }
 
         specialcount += countthisk;
-
+        cerr << "Segment " << k << " of " << (long long)(x13+EP) << " done." << endl;
     }
 
     if (DEBUG_SP) {

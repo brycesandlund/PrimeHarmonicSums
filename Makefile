@@ -17,7 +17,7 @@ ordhi : ordhi.cpp
 	g++ -I$(IDIR) -L$(LDIR) ordhi.cpp -lntl -lm -o ordhi
 endgamehi : endgamehi.cpp
 	g++ -I$(IDIR) -L$(LDIR) endgamehi.cpp -lntl -lm -o endgamehi
-endgame_main : endgame_main.cpp endgame.cpp
+endgame_main : endgame_main.cpp endgame.cpp utility.h
 	g++ -I$(IDIR) -L$(LDIR) -O3 endgame_main.cpp -lntl -lm -o endgame_main
 special_main : special.cpp special_main.cpp RangeArray.h Primefns.h
 	g++ -I$(IDIR) -L$(LDIR) special_main.cpp -O3 -lntl -lm -o special_main

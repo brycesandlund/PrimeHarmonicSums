@@ -106,7 +106,7 @@ long long schofeld_crossover(ftype &sum, ftype goal, long long lo, long long hi)
         cerr << "bloksize: " << bloksize << endl; 
     }
     unsigned int i;
-    unsigned char Xblok[xsize]; // bit vector, re-used
+    unsigned char *Xblok = new unsigned char[xsize]; // bit vector, re-used
    
     unsigned char *G = new unsigned char[pcount];   // G[0] ... G[g-1] are half-gaps between odd primes
     long g;                    // G[0] = (5-3)/2, G[1] = (7-5)/2, etc.

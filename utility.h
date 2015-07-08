@@ -5,7 +5,7 @@
 #define DEBUG_SP 0
 #define DEBUG_OD 0
 #define DEBUG_S2 0
-#define DEBUG_EG 0
+#define DEBUG_EG 1
 #define EP 1e-20
 
 #include <cstdio>
