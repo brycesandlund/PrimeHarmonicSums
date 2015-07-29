@@ -2,6 +2,7 @@
 #define _UTILITY
 
 #define DEBUG 0
+#define DEBUG_BS 1
 #define DEBUG_SP 0
 #define DEBUG_OD 0
 #define DEBUG_S2 0
