@@ -41,7 +41,7 @@ fullsum : fullsum.cpp RangeArray.h special.cpp ordinary.cpp S2.cpp Primefns.h ut
 	g++ -I$(IDIR) -L$(LDIR) -O3 fullsum.cpp -lntl -lm -o fullsum
 crossover : crossover.cpp RangeArray.h special.cpp ordinary.cpp S2.cpp Primefns.h endgame.cpp sinterval.cpp utility.h
 	g++ -I$(IDIR) -L$(LDIR) -O3 crossover.cpp -lntl -lm -o crossover
-blocksieve_main : blocksieve.cpp blocksieve_main
+blocksieve_main : blocksieve.cpp blocksieve_main.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 blocksieve_main.cpp -lntl -lm -o blocksieve_main
 sinterval_main : sinterval_main.cpp
 	g++ -I$(IDIR) -L$(LDIR) -O3 sinterval_main.cpp -lntl -lm -o sinterval_main
